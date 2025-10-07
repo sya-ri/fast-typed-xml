@@ -1,7 +1,13 @@
 {
-  "name": "typed-xml",
-  "version": "0.1.0",
-  "description": "A strongly typed XML parsing and manipulation library for TypeScript, providing type-safe XML handling capabilities",
-  "author": "sya-ri",
-  "scripts": {}
+    "name": "typed-xml",
+    "version": "0.1.0",
+    "description": "A strongly typed XML parsing and manipulation library for TypeScript, providing type-safe XML handling capabilities",
+    "author": "sya-ri",
+    "scripts": {
+        "check": "biome check .",
+        "fix": "biome check --write ."
+    },
+    "devDependencies": {
+        "@biomejs/biome": "2.2.5"
+    }
 }
