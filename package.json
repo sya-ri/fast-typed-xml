@@ -1,0 +1,7 @@
+{
+  "name": "typed-xml",
+  "version": "0.1.0",
+  "description": "A strongly typed XML parsing and manipulation library for TypeScript, providing type-safe XML handling capabilities",
+  "author": "sya-ri",
+  "scripts": {}
+}
