@@ -4,6 +4,7 @@
     "description": "A strongly typed XML parsing and manipulation library for TypeScript, providing type-safe XML handling capabilities",
     "author": "sya-ri",
     "scripts": {
+        "test": "vitest",
         "check": "run-p check:*",
         "check:biome": "biome check .",
         "check:package-json": "sort-package-json --check",
@@ -14,6 +15,7 @@
     "devDependencies": {
         "@biomejs/biome": "2.2.5",
         "npm-run-all2": "8.0.4",
-        "sort-package-json": "3.4.0"
+        "sort-package-json": "3.4.0",
+        "vitest": "3.2.4"
     }
 }
