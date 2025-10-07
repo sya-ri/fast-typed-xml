@@ -1,16 +1,16 @@
 import { parseXML } from "./parser";
 
 describe("parseXML", () => {
-    it("parses simple element", () => {
+    it("parses simple element", async () => {
         const xml = "<root></root>";
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
         });
     });
 
-    it("parses element with attributes", () => {
+    it("parses element with attributes", async () => {
         const xml = '<root id="1" class="main"></root>';
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             attrs: {
                 id: "1",
@@ -19,17 +19,17 @@ describe("parseXML", () => {
         });
     });
 
-    it("parses element with text content", () => {
+    it("parses element with text content", async () => {
         const xml = "<root>Hello</root>";
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             text: "Hello",
         });
     });
 
-    it("parses nested elements", () => {
+    it("parses nested elements", async () => {
         const xml = "<root><child>Text</child></root>";
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             children: [
                 {
@@ -40,9 +40,9 @@ describe("parseXML", () => {
         });
     });
 
-    it("parses self-closing tags", () => {
+    it("parses self-closing tags", async () => {
         const xml = "<root><empty/></root>";
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             children: [
                 {
@@ -52,9 +52,9 @@ describe("parseXML", () => {
         });
     });
 
-    it("parses nested elements with attributes and text", () => {
+    it("parses nested elements with attributes and text", async () => {
         const xml = '<root><child id="1">Text</child></root>';
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             children: [
                 {
@@ -68,10 +68,10 @@ describe("parseXML", () => {
         });
     });
 
-    it("parses deeply nested elements", () => {
+    it("parses deeply nested elements", async () => {
         const xml =
             "<root><level1><level2><level3>Deep</level3></level2></level1></root>";
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             children: [
                 {
@@ -92,10 +92,10 @@ describe("parseXML", () => {
         });
     });
 
-    it("parses multiple child elements", () => {
+    it("parses multiple child elements", async () => {
         const xml =
             "<root><child>First</child><child>Second</child><child>Third</child></root>";
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             children: [
                 {
@@ -114,9 +114,9 @@ describe("parseXML", () => {
         });
     });
 
-    it("parses multiple child elements with mixed content", () => {
+    it("parses multiple child elements with mixed content", async () => {
         const xml = "<root><a>1</a><b/><c>3</c></root>";
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             children: [
                 {
@@ -134,10 +134,10 @@ describe("parseXML", () => {
         });
     });
 
-    it("parses multiple sibling elements with attributes", () => {
+    it("parses multiple sibling elements with attributes", async () => {
         const xml =
             '<root><item id="1" type="a"/><item id="2" type="b"/></root>';
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             children: [
                 {
@@ -158,18 +158,18 @@ describe("parseXML", () => {
         });
     });
 
-    it("ignores comments in XML", () => {
+    it("ignores comments in XML", async () => {
         const xml =
             "<root><!-- This is a comment -->text<!-- Another comment --></root>";
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             text: "text",
         });
     });
 
-    it("parses XML with DOCTYPE declaration", () => {
+    it("parses XML with DOCTYPE declaration", async () => {
         const xml = '<!DOCTYPE html><root id="1">content</root>';
-        expect(parseXML(xml)).toEqual({
+        expect(await parseXML(xml)).toEqual({
             name: "root",
             attrs: {
                 id: "1",
