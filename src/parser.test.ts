@@ -177,4 +177,32 @@ describe("parseXML", () => {
             text: "content",
         });
     });
+
+    it("throws error on mismatched tags", async () => {
+        const xml = "<root><child></root></child>";
+        await expect(parseXML(xml)).rejects.toThrow(
+            `Mismatched closing tag: expected </child> got </root> at 19. Near: "<root><child></root></child>"`,
+        );
+    });
+
+    it("throws error on invalid attribute syntax", async () => {
+        const xml = '<root id="1" class=></root>';
+        await expect(parseXML(xml)).rejects.toThrow(
+            `Expected quoted attribute value at 19. Near: "<root id="1" class=></root>"`,
+        );
+    });
+
+    it("throws error on unclosed tags", async () => {
+        const xml = "<root><child>";
+        await expect(parseXML(xml)).rejects.toThrow(
+            `Unclosed element <child> at 13. Near: "<root><child>"`,
+        );
+    });
+
+    it("throws error on empty input", async () => {
+        const xml = "";
+        await expect(parseXML(xml)).rejects.toThrow(
+            `Expected element start '<' at 0. Near: ""`,
+        );
+    });
 });

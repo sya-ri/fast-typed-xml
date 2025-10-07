@@ -50,21 +50,19 @@ class XMLParser {
     private s = "";
     private i = 0;
     private done = false;
-    private readonly src: AsyncIterable<string | Uint8Array>;
+    private pullPromise: Promise<void> | null = null;
     private readonly trimText: boolean;
     private readonly maxDepth: number;
     private readonly maxChildren: number;
     private readonly maxAttrs: number;
-    private pullPromise: Promise<void> | null = null;
     private readonly it: AsyncIterator<string | Uint8Array>;
 
     constructor(src: AsyncIterable<string | Uint8Array>, opts: ParseOptions) {
-        this.src = src;
-        this.trimText = !!opts.trimText;
+        this.trimText = opts.trimText ?? false;
         this.maxDepth = opts.maxDepth ?? 64;
         this.maxChildren = opts.maxChildren ?? 2000;
         this.maxAttrs = opts.maxAttrs ?? 128;
-        this.it = this.src[Symbol.asyncIterator]();
+        this.it = src[Symbol.asyncIterator]();
     }
 
     private async ensure(n: number): Promise<void> {
