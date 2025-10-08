@@ -1,5 +1,5 @@
 import { describe, expect } from "vitest";
-import { tx } from "./index";
+import * as tx from "./index";
 import {
     BooleanAttributeSchema,
     BooleanElementSchema,
