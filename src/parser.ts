@@ -8,14 +8,28 @@ export type NodeLike = {
 };
 
 export type ParseOptions = {
-    /** if true, trims text nodes (outside CDATA) */
+    /**
+     * If true, trims text nodes (outside CDATA)
+     */
     trimText?: boolean;
-    /** guard: Maximum depth (default 64) */
+
+    /**
+     * Maximum element nesting depth
+     * @default 64
+     */
     maxDepth?: number;
-    /** guard: Max children per element (default 2000) */
+
+    /**
+     * Maximum number of children per element
+     * @default 2000
+     */
     maxChildren?: number;
-    /** guard: Max attributes per element (default 128) */
-    maxAttrs?: number;
+
+    /**
+     * Maximum number of attributes per element
+     * @default 128
+     */
+    maxAttributes?: number;
 };
 
 const chunkToString = (ch: string | Uint8Array): string => {
@@ -23,21 +37,21 @@ const chunkToString = (ch: string | Uint8Array): string => {
     return new TextDecoder("utf-8").decode(ch);
 };
 
-export async function parseXML(
+export async function parse(
     xml: string,
-    opts: ParseOptions = {},
+    options: ParseOptions = {},
 ): Promise<NodeLike> {
     const iterable = (async function* () {
         yield xml;
     })();
-    return parseXMLStream(iterable, opts);
+    return parseStream(iterable, options);
 }
 
-export async function parseXMLStream(
+export async function parseStream(
     src: AsyncIterable<string | Uint8Array>,
-    opts: ParseOptions = {},
+    options: ParseOptions = {},
 ): Promise<NodeLike> {
-    const parser = new XMLParser(src, opts);
+    const parser = new XMLParser(src, options);
     return parser.parseDocument();
 }
 
@@ -49,22 +63,25 @@ class XMLParser {
     private readonly trimText: boolean;
     private readonly maxDepth: number;
     private readonly maxChildren: number;
-    private readonly maxAttrs: number;
-    private readonly it: AsyncIterator<string | Uint8Array>;
+    private readonly maxAttributes: number;
+    private readonly iterator: AsyncIterator<string | Uint8Array>;
 
-    constructor(src: AsyncIterable<string | Uint8Array>, opts: ParseOptions) {
-        this.trimText = opts.trimText ?? false;
-        this.maxDepth = opts.maxDepth ?? 64;
-        this.maxChildren = opts.maxChildren ?? 2000;
-        this.maxAttrs = opts.maxAttrs ?? 128;
-        this.it = src[Symbol.asyncIterator]();
+    constructor(
+        src: AsyncIterable<string | Uint8Array>,
+        options: ParseOptions,
+    ) {
+        this.trimText = options.trimText ?? false;
+        this.maxDepth = options.maxDepth ?? 64;
+        this.maxChildren = options.maxChildren ?? 2000;
+        this.maxAttributes = options.maxAttributes ?? 128;
+        this.iterator = src[Symbol.asyncIterator]();
     }
 
     private async ensure(n: number): Promise<void> {
         while (!this.done && this.s.length < this.i + n) {
             if (!this.pullPromise) {
                 this.pullPromise = (async () => {
-                    const r = await this.it.next();
+                    const r = await this.iterator.next();
                     if (r.done) {
                         this.done = true;
                         return;
@@ -247,7 +264,8 @@ class XMLParser {
             await this.skipWS();
             await this.expect("=");
             attributes[name] = await this.readAttrValue();
-            if (this.maxAttrs < ++attrCount) this.error("Too many attributes");
+            if (this.maxAttributes < ++attrCount)
+                this.error("Too many attributes");
         }
 
         await this.skipWS();
