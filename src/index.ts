@@ -1,10 +1,14 @@
 import {
+    ArraySchema,
     BooleanAttributeSchema,
     BooleanElementSchema,
+    type Infer,
     NumberAttributeSchema,
     NumberElementSchema,
+    ObjectSchema,
     type OptionalSchema,
     RequiredSchema,
+    type RootableSchema,
     type Schema,
     StringAttributeSchema,
     StringElementSchema,
@@ -18,6 +22,7 @@ export {
     parseStream,
 } from "./parser";
 export type {
+    Infer,
     OptionalSchema,
     RootableSchema,
     Schema,
@@ -70,10 +75,14 @@ export const boolean = <Optional extends boolean = false>(
         : new RequiredSchema(base);
 };
 
-export * from "./error";
-export * from "./parser";
-export type {
-    OptionalSchema,
-    RootableSchema,
-    Schema,
-} from "./schema";
+export const object = <S extends Record<string, Schema<unknown>>>(
+    children: S,
+): RootableSchema<{ [K in keyof S]: Infer<S[K]> }> => {
+    return new ObjectSchema(children);
+};
+
+export const array = <S extends Record<string, Schema<unknown>>>(
+    children: S,
+): RootableSchema<{ [K in keyof S]: Infer<S[K]> }[]> => {
+    return new ArraySchema(children);
+};

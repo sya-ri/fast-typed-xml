@@ -53,3 +53,57 @@ describe.each([
         });
     });
 });
+
+describe("tx.object", () => {
+    it("should parse an object", async () => {
+        const schema = tx.object({
+            id: tx.string("attribute", "ID"),
+            str: tx.string("element", "STR"),
+            num: tx.number("element", "NUM"),
+        });
+        const actual = await schema.parse(
+            "<root ID='abc123'><STR>Hello</STR><NUM>123</NUM></root>",
+        );
+        expect(actual).toEqual({
+            id: "abc123",
+            str: "Hello",
+            num: 123,
+        });
+    });
+});
+
+describe("tx.array", () => {
+    it("should parse an array of objects", async () => {
+        const schema = tx.array({
+            id: tx.string("attribute", "ID"),
+            name: tx.string("element", "NAME"),
+            age: tx.number("element", "AGE"),
+            active: tx.boolean("element", "ACTIVE"),
+        });
+        const actual = await schema.parse(
+            "<root><item ID='1'><NAME>Alice</NAME><AGE>25</AGE><ACTIVE>true</ACTIVE></item><item ID='2'><NAME>Bob</NAME><AGE>30</AGE><ACTIVE>false</ACTIVE></item></root>",
+        );
+        expect(actual).toEqual([
+            {
+                id: "1",
+                name: "Alice",
+                age: 25,
+                active: true,
+            },
+            {
+                id: "2",
+                name: "Bob",
+                age: 30,
+                active: false,
+            },
+        ]);
+    });
+
+    it("should parse empty array", async () => {
+        const schema = tx.array({
+            item: tx.string("element", "ITEM"),
+        });
+        const actual = await schema.parse("<root></root>");
+        expect(actual).toEqual([]);
+    });
+});
