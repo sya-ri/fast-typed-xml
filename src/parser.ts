@@ -1,3 +1,5 @@
+import { ParseError } from "./error";
+
 export type NodeLike = {
     name: string;
     attributes?: Record<string, string>;
@@ -37,13 +39,6 @@ export async function parseXMLStream(
 ): Promise<NodeLike> {
     const parser = new XMLParser(src, opts);
     return parser.parseDocument();
-}
-
-export class ParseError extends Error {
-    constructor(msg: string) {
-        super(msg);
-        this.name = "ParseError";
-    }
 }
 
 class XMLParser {
