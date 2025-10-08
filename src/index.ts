@@ -10,7 +10,7 @@ import {
     StringElementSchema,
 } from "./schema";
 
-type Kind = "attribute" | "element";
+export type Kind = "attribute" | "element";
 
 export const tx = {
     string: <Optional extends boolean = false>(
@@ -58,3 +58,9 @@ export const tx = {
 };
 
 export * from "./error";
+export * from "./parser";
+export type {
+    OptionalSchema,
+    RootableSchema,
+    Schema,
+} from "./schema";
