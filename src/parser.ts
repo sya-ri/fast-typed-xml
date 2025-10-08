@@ -1,6 +1,6 @@
 export type NodeLike = {
     name: string;
-    attrs?: Record<string, string>;
+    attributes?: Record<string, string>;
     children?: NodeLike[];
     text?: string;
 };
@@ -241,7 +241,7 @@ class XMLParser {
         }
         this.i++;
         const name = await this.readName();
-        const attrs: Record<string, string> = {};
+        const attributes: Record<string, string> = {};
         let attrCount = 0;
 
         while (true) {
@@ -251,7 +251,7 @@ class XMLParser {
             const name = await this.readName();
             await this.skipWS();
             await this.expect("=");
-            attrs[name] = await this.readAttrValue();
+            attributes[name] = await this.readAttrValue();
             if (this.maxAttrs < ++attrCount) this.error("Too many attributes");
         }
 
@@ -259,7 +259,7 @@ class XMLParser {
         if (await this.startsWith("/>")) {
             this.i += 2;
             const node: NodeLike = { name };
-            if (attrCount) node.attrs = attrs;
+            if (attrCount) node.attributes = attributes;
             return node;
         }
 
@@ -316,7 +316,7 @@ class XMLParser {
         }
 
         const node: NodeLike = { name };
-        if (attrCount) node.attrs = attrs;
+        if (attrCount) node.attributes = attributes;
         const text = this.trimText ? textBuf.trim() : textBuf;
         if (children.length) node.children = children;
         if (text?.length) node.text = text;

@@ -12,7 +12,7 @@ describe("parseXML", () => {
         const xml = '<root id="1" class="main"></root>';
         expect(await parseXML(xml)).toEqual({
             name: "root",
-            attrs: {
+            attributes: {
                 id: "1",
                 class: "main",
             },
@@ -59,7 +59,7 @@ describe("parseXML", () => {
             children: [
                 {
                     name: "child",
-                    attrs: {
+                    attributes: {
                         id: "1",
                     },
                     text: "Text",
@@ -142,14 +142,14 @@ describe("parseXML", () => {
             children: [
                 {
                     name: "item",
-                    attrs: {
+                    attributes: {
                         id: "1",
                         type: "a",
                     },
                 },
                 {
                     name: "item",
-                    attrs: {
+                    attributes: {
                         id: "2",
                         type: "b",
                     },
@@ -171,7 +171,7 @@ describe("parseXML", () => {
         const xml = '<!DOCTYPE html><root id="1">content</root>';
         expect(await parseXML(xml)).toEqual({
             name: "root",
-            attrs: {
+            attributes: {
                 id: "1",
             },
             text: "content",
