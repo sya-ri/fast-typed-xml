@@ -44,7 +44,9 @@ export class AttributeSchema<
                 // @ts-expect-error returns undefined when optional is true
                 return undefined;
             } else {
-                throw new InvalidInputError("Missing required value");
+                throw new InvalidInputError(
+                    `Missing required value: ${this.name}`,
+                );
             }
         }
         return this.map(value);
@@ -102,7 +104,9 @@ export class ElementSchema<T, Optional extends boolean> extends AbstractSchema<
                 // @ts-expect-error returns undefined when optional is true
                 return undefined;
             } else {
-                throw new InvalidInputError("Missing required value");
+                throw new InvalidInputError(
+                    `Missing required value: ${this.name}`,
+                );
             }
         }
         return this.schema.decode(child);
@@ -151,7 +155,9 @@ export class ArraySchema<T, Optional extends boolean> extends AbstractSchema<
                 // @ts-expect-error returns undefined when optional is true
                 return undefined;
             } else {
-                throw new InvalidInputError("Missing required value");
+                throw new InvalidInputError(
+                    `Missing required value: ${node.name}`,
+                );
             }
         }
 

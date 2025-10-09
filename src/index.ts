@@ -190,7 +190,7 @@ export function array<T, Optional extends boolean = false>(
     name: string,
     schema: ValueSchema<T>,
     optional?: Optional,
-): Schema<T[], Optional>;
+): ElementSchema<T[], Optional>;
 
 export function array<
     T extends Record<string, unknown>,
@@ -199,13 +199,13 @@ export function array<
     name: string,
     schema: ObjectSchema<T>,
     optional?: Optional,
-): Schema<T[], Optional>;
+): ElementSchema<T, Optional>;
 
 export function array<T, Optional extends boolean = false>(
     nameOrSchema: string | Schema<T, boolean>, // Schema<T>: ValueSchema<T> | ObjectSchema<T>
     schemaOrOptional?: Schema<T, boolean> | Optional, // Schema<T>: ValueSchema<T> | ObjectSchema<T>
     optional?: Optional,
-): Schema<T[], false> | Schema<T[], Optional> {
+): ArraySchema<T, Optional> | ElementSchema<T[], Optional> {
     if (typeof nameOrSchema === "string") {
         return new ElementSchema(
             nameOrSchema as string,
@@ -214,7 +214,7 @@ export function array<T, Optional extends boolean = false>(
                 optional as Optional,
             ),
             optional as Optional,
-        ) as Schema<T[], Optional>;
+        ) as ElementSchema<T[], Optional>;
     } else {
         return new ArraySchema(
             nameOrSchema as Schema<T, boolean>,
