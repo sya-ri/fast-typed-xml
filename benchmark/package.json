@@ -1,0 +1,19 @@
+{
+    "name": "benchmark",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "run": "tsx src/index.ts"
+    },
+    "dependencies": {
+        "fast-xml-parser": "^5.3.0",
+        "tinybench": "^5.0.1",
+        "typed-xml": "file:../",
+        "xml2js": "^0.6.2"
+    },
+    "devDependencies": {
+        "@types/node": "^24.7.0",
+        "@types/xml2js": "^0.4.14",
+        "tsx": "^4.20.6"
+    }
+}
