@@ -11,16 +11,33 @@ export interface Schema<T, Optional extends boolean> {
     ) => Promise<Optional extends true ? T | undefined : T>;
 }
 
-export type Infer<S> = S extends Schema<infer T, boolean> ? T : never;
-
-export class AttributeSchema<T, Optional extends boolean>
+export abstract class AbstractSchema<T, Optional extends boolean>
     implements Schema<T, Optional>
 {
+    abstract decode(node: NodeLike): Optional extends true ? T | undefined : T;
+
+    async parse(
+        xml: string,
+        options?: ParseOptions,
+    ): Promise<Optional extends true ? T | undefined : T> {
+        const node = await parse(xml, options);
+        return this.decode(node);
+    }
+}
+
+export type Infer<S> = S extends Schema<infer T, boolean> ? T : never;
+
+export class AttributeSchema<
+    T,
+    Optional extends boolean,
+> extends AbstractSchema<T, Optional> {
     constructor(
         private readonly name: string,
         private readonly optional: Optional,
         private readonly map: (v: string) => T,
-    ) {}
+    ) {
+        super();
+    }
 
     decode(node: NodeLike): Optional extends true ? T | undefined : T {
         const value = node.attributes?.[this.name];
@@ -33,14 +50,6 @@ export class AttributeSchema<T, Optional extends boolean>
             }
         }
         return this.map(value);
-    }
-
-    async parse(
-        xml: string,
-        options?: ParseOptions,
-    ): Promise<Optional extends true ? T | undefined : T> {
-        const node = await parse(xml, options);
-        return this.decode(node);
     }
 }
 
@@ -59,17 +68,14 @@ export const booleanAttributeSchema = <Optional extends boolean>(
     optional: Optional,
 ) => new AttributeSchema(name, optional, parseBooleanOrFail);
 
-export class ValueSchema<T> implements Schema<T, false> {
-    constructor(private readonly map: (v: string) => T) {}
+export class ValueSchema<T> extends AbstractSchema<T, false> {
+    constructor(private readonly map: (v: string) => T) {
+        super();
+    }
 
     decode(node: NodeLike): T {
         const value = node.text ?? "";
         return this.map(value);
-    }
-
-    async parse(xml: string, options?: ParseOptions): Promise<T> {
-        const node = await parse(xml, options);
-        return this.decode(node);
     }
 }
 
@@ -79,14 +85,17 @@ export const numberValueSchema = new ValueSchema<number>(parseNumberOrFail);
 
 export const booleanValueSchema = new ValueSchema<boolean>(parseBooleanOrFail);
 
-export class ElementSchema<T, Optional extends boolean>
-    implements Schema<T, Optional>
-{
+export class ElementSchema<T, Optional extends boolean> extends AbstractSchema<
+    T,
+    Optional
+> {
     constructor(
         private readonly name: string,
         private readonly schema: Schema<T, Optional>,
         private readonly optional: Optional,
-    ) {}
+    ) {
+        super();
+    }
 
     decode(node: NodeLike): Optional extends true ? T | undefined : T {
         const child = getChild(node, this.name);
@@ -100,25 +109,19 @@ export class ElementSchema<T, Optional extends boolean>
         }
         return this.schema.decode(child);
     }
-
-    async parse(
-        xml: string,
-        options?: ParseOptions,
-    ): Promise<Optional extends true ? T | undefined : T> {
-        const node = await parse(xml, options);
-        return this.decode(node);
-    }
 }
 
-export class ObjectSchema<T extends Record<string, unknown>>
-    implements Schema<T, false>
-{
+export class ObjectSchema<
+    T extends Record<string, unknown>,
+> extends AbstractSchema<T, false> {
     constructor(
         private readonly children: Record<
             string,
             AttributeSchema<unknown, boolean> | ElementSchema<unknown, boolean>
         >,
-    ) {}
+    ) {
+        super();
+    }
 
     decode(node: NodeLike): T {
         const obj: Record<string, unknown> = {};
@@ -130,20 +133,18 @@ export class ObjectSchema<T extends Record<string, unknown>>
         }
         return obj as T;
     }
-
-    async parse(xml: string, options?: ParseOptions): Promise<T> {
-        const node = await parse(xml, options);
-        return this.decode(node);
-    }
 }
 
-export class ArraySchema<T, Optional extends boolean>
-    implements Schema<T[], Optional>
-{
+export class ArraySchema<T, Optional extends boolean> extends AbstractSchema<
+    T[],
+    Optional
+> {
     constructor(
         private readonly schema: Schema<T, boolean>,
         private readonly optional: Optional,
-    ) {}
+    ) {
+        super();
+    }
 
     decode(node: NodeLike): Optional extends true ? T[] | undefined : T[] {
         const children = node.children;
@@ -164,13 +165,5 @@ export class ArraySchema<T, Optional extends boolean>
             }
         }
         return arr;
-    }
-
-    async parse(
-        xml: string,
-        options?: ParseOptions,
-    ): Promise<Optional extends true ? T[] | undefined : T[]> {
-        const node = await parse(xml, options);
-        return this.decode(node);
     }
 }

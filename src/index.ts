@@ -22,6 +22,7 @@ export {
     parseStream,
 } from "./parser";
 export type {
+    AbstractSchema,
     Infer,
     Schema,
 } from "./schema";
