@@ -148,7 +148,7 @@ export function object<
     name: string,
     children: S,
     optional?: Optional,
-): Schema<{ [K in keyof S]: Infer<S[K]> }, Optional>;
+): ElementSchema<{ [K in keyof S]: Infer<S[K]> }, Optional>;
 
 export function object<
     S extends Record<
@@ -162,13 +162,13 @@ export function object<
     optional?: Optional,
 ):
     | ObjectSchema<{ [K in keyof S]: Infer<S[K]> }>
-    | Schema<{ [K in keyof S]: Infer<S[K]> }, Optional> {
+    | ElementSchema<{ [K in keyof S]: Infer<S[K]> }, Optional> {
     if (typeof nameOrChildren === "string") {
         return new ElementSchema(
             nameOrChildren as string,
             new ObjectSchema(children as S),
             optional as Optional,
-        ) as Schema<{ [K in keyof S]: Infer<S[K]> }, Optional>;
+        ) as ElementSchema<{ [K in keyof S]: Infer<S[K]> }, Optional>;
     } else {
         return new ObjectSchema(nameOrChildren as S) as ObjectSchema<{
             [K in keyof S]: Infer<S[K]>;
@@ -177,19 +177,33 @@ export function object<
 }
 
 export function array<T, Optional extends boolean = false>(
-    schema: Schema<T, boolean>,
+    schema: ValueSchema<T>,
     optional?: Optional,
 ): Schema<T[], Optional>;
+
+export function array<
+    T extends Record<string, unknown>,
+    Optional extends boolean = false,
+>(schema: ObjectSchema<T>, optional?: Optional): Schema<T[], Optional>;
 
 export function array<T, Optional extends boolean = false>(
     name: string,
-    schema: Schema<T, boolean>,
+    schema: ValueSchema<T>,
+    optional?: Optional,
+): Schema<T[], Optional>;
+
+export function array<
+    T extends Record<string, unknown>,
+    Optional extends boolean = false,
+>(
+    name: string,
+    schema: ObjectSchema<T>,
     optional?: Optional,
 ): Schema<T[], Optional>;
 
 export function array<T, Optional extends boolean = false>(
-    nameOrSchema: string | Schema<T, boolean>,
-    schemaOrOptional?: Schema<T, boolean> | Optional,
+    nameOrSchema: string | Schema<T, boolean>, // Schema<T>: ValueSchema<T> | ObjectSchema<T>
+    schemaOrOptional?: Schema<T, boolean> | Optional, // Schema<T>: ValueSchema<T> | ObjectSchema<T>
     optional?: Optional,
 ): Schema<T[], false> | Schema<T[], Optional> {
     if (typeof nameOrSchema === "string") {
