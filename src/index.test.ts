@@ -1,55 +1,52 @@
+import { faker } from "@faker-js/faker";
 import { describe, expect } from "vitest";
 import * as tx from "./index";
 import {
-    BooleanAttributeSchema,
-    BooleanElementSchema,
-    NumberAttributeSchema,
-    NumberElementSchema,
-    RequiredSchema,
-    StringAttributeSchema,
-    StringElementSchema,
+    AttributeSchema,
+    booleanValueSchema,
+    ElementSchema,
+    numberValueSchema,
+    stringValueSchema,
 } from "./schema";
 
 describe.each([
     [
         tx.string,
         [
-            ["attribute", StringAttributeSchema],
-            ["element", StringElementSchema],
+            ["attribute", AttributeSchema, undefined],
+            ["element", ElementSchema, stringValueSchema],
         ],
     ],
     [
         tx.number,
         [
-            ["attribute", NumberAttributeSchema],
-            ["element", NumberElementSchema],
+            ["attribute", AttributeSchema, undefined],
+            ["element", ElementSchema, numberValueSchema],
         ],
     ],
     [
         tx.boolean,
         [
-            ["attribute", BooleanAttributeSchema],
-            ["element", BooleanElementSchema],
+            ["attribute", AttributeSchema, undefined],
+            ["element", ElementSchema, booleanValueSchema],
         ],
     ],
 ] as const)("%o", (fn, cases) => {
-    // @ts-expect-error ignore cases type error
-    describe.each(cases)("%s -> %o", (kind, clazz) => {
-        it("should return schema when optional is true", () => {
-            const schema = fn(kind, "NAME", true);
-            expect(schema instanceof clazz).toBe(true);
-            // @ts-expect-error name is private
-            expect(schema.name).toBe("NAME");
-        });
+    // @ts-expect-error
+    describe.each(cases)("%s -> %o", (kind, clazz, innerSchema) => {
+        it("should return schema", () => {
+            const optional = faker.datatype.boolean();
 
-        it("should return RequiredSchema wrapping schema when optional is false", () => {
-            const wrapped = fn(kind, "NAME", false);
-            // noinspection SuspiciousTypeOfGuard
-            expect(wrapped instanceof RequiredSchema).toBe(true);
+            // @ts-expect-error
+            const actual = fn(kind, "NAME", optional);
+
+            expect(actual instanceof clazz).toBe(true);
+            // @ts-expect-error name is private
+            expect(actual.name).toBe("NAME");
+            // @ts-expect-error optional is private
+            expect(actual.optional).toBe(optional);
             // @ts-expect-error schema is private
-            const base = wrapped.schema;
-            expect(base instanceof clazz).toBe(true);
-            expect(base.name).toBe("NAME");
+            expect(actual.schema).toBe(innerSchema);
         });
     });
 });
@@ -74,12 +71,14 @@ describe("tx.object", () => {
 
 describe("tx.array", () => {
     it("should parse an array of objects", async () => {
-        const schema = tx.array({
-            id: tx.string("attribute", "ID"),
-            name: tx.string("element", "NAME"),
-            age: tx.number("element", "AGE"),
-            active: tx.boolean("element", "ACTIVE"),
-        });
+        const schema = tx.array(
+            tx.object({
+                id: tx.string("attribute", "ID"),
+                name: tx.string("element", "NAME"),
+                age: tx.number("element", "AGE"),
+                active: tx.boolean("element", "ACTIVE"),
+            }),
+        );
         const actual = await schema.parse(
             "<root><item ID='1'><NAME>Alice</NAME><AGE>25</AGE><ACTIVE>true</ACTIVE></item><item ID='2'><NAME>Bob</NAME><AGE>30</AGE><ACTIVE>false</ACTIVE></item></root>",
         );
@@ -100,10 +99,8 @@ describe("tx.array", () => {
     });
 
     it("should parse empty array", async () => {
-        const schema = tx.array({
-            item: tx.string("element", "ITEM"),
-        });
+        const schema = tx.array(tx.string(), true);
         const actual = await schema.parse("<root></root>");
-        expect(actual).toEqual([]);
+        expect(actual).toEqual(undefined);
     });
 });

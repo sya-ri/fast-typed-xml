@@ -1,18 +1,11 @@
 import { InvalidInputError } from "./error";
 import type { NodeLike } from "./parser";
 
-export const getAttribute = (
+export const getChild = (
     node: NodeLike,
     name: string,
-): string | undefined => {
-    return node.attributes?.[name];
-};
-
-export const getElement = (
-    node: NodeLike,
-    name: string,
-): string | undefined => {
-    return node.children?.find((v) => v.name === name)?.text;
+): NodeLike | undefined => {
+    return node.children?.find((v) => v.name === name);
 };
 
 export const parseNumberOrFail = (value: string): number => {

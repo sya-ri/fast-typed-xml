@@ -1,17 +1,17 @@
 import {
     ArraySchema,
-    BooleanAttributeSchema,
-    BooleanElementSchema,
+    type AttributeSchema,
+    booleanAttributeSchema,
+    booleanValueSchema,
+    ElementSchema,
     type Infer,
-    NumberAttributeSchema,
-    NumberElementSchema,
+    numberAttributeSchema,
+    numberValueSchema,
     ObjectSchema,
-    type OptionalSchema,
-    RequiredSchema,
-    type RootableSchema,
     type Schema,
-    StringAttributeSchema,
-    StringElementSchema,
+    stringAttributeSchema,
+    stringValueSchema,
+    type ValueSchema,
 } from "./schema";
 
 export * from "./error";
@@ -23,66 +23,197 @@ export {
 } from "./parser";
 export type {
     Infer,
-    OptionalSchema,
-    RootableSchema,
     Schema,
 } from "./schema";
 
-export type Kind = "attribute" | "element";
+export function string(): ValueSchema<string>;
 
-export const string = <Optional extends boolean = false>(
-    kind: Kind,
+export function string<Optional extends boolean = false>(
+    kind: "attribute",
     name: string,
-    optional: Optional = false as Optional,
-): Optional extends true ? OptionalSchema<string> : Schema<string> => {
-    const base =
-        kind === "attribute"
-            ? new StringAttributeSchema(name)
-            : new StringElementSchema(name);
-    return optional
-        ? // @ts-expect-error Returns OptionalSchema<string> when Optional = true
-          base
-        : new RequiredSchema(base);
-};
+    optional?: Optional,
+): AttributeSchema<string, Optional>;
 
-export const number = <Optional extends boolean = false>(
-    kind: Kind,
+export function string<Optional extends boolean = false>(
+    kind: "element",
     name: string,
-    optional: Optional = false as Optional,
-): Optional extends true ? OptionalSchema<number> : Schema<number> => {
-    const base =
-        kind === "attribute"
-            ? new NumberAttributeSchema(name)
-            : new NumberElementSchema(name);
-    return optional
-        ? // @ts-expect-error Returns OptionalSchema<number> when Optional = true
-          base
-        : new RequiredSchema(base);
-};
+    optional?: Optional,
+): ElementSchema<string, Optional>;
 
-export const boolean = <Optional extends boolean = false>(
-    kind: Kind,
+export function string<Optional extends boolean = false>(
+    kind?: "attribute" | "element",
+    name?: string,
+    optional?: Optional,
+):
+    | AttributeSchema<string, Optional>
+    | ValueSchema<string>
+    | ElementSchema<string, Optional> {
+    if (name !== undefined) {
+        if (kind === "attribute") {
+            return stringAttributeSchema(name, optional as Optional);
+        } else if (kind === "element") {
+            return new ElementSchema(
+                name,
+                stringValueSchema,
+                optional as Optional,
+            );
+        }
+    }
+    return stringValueSchema;
+}
+
+export function number(): ValueSchema<number>;
+
+export function number<Optional extends boolean = false>(
+    kind: "attribute",
     name: string,
-    optional: Optional = false as Optional,
-): Optional extends true ? OptionalSchema<boolean> : Schema<boolean> => {
-    const base =
-        kind === "attribute"
-            ? new BooleanAttributeSchema(name)
-            : new BooleanElementSchema(name);
-    return optional
-        ? // @ts-expect-error Returns OptionalSchema<boolean> when Optional = true
-          base
-        : new RequiredSchema(base);
-};
+    optional?: Optional,
+): AttributeSchema<number, Optional>;
 
-export const object = <S extends Record<string, Schema<unknown>>>(
+export function number<Optional extends boolean = false>(
+    kind: "element",
+    name: string,
+    optional?: Optional,
+): ElementSchema<number, Optional>;
+
+export function number<Optional extends boolean = false>(
+    kind?: "attribute" | "element",
+    name?: string,
+    optional?: Optional,
+):
+    | AttributeSchema<number, Optional>
+    | ValueSchema<number>
+    | ElementSchema<number, Optional> {
+    if (name !== undefined) {
+        switch (kind) {
+            case "attribute": {
+                return numberAttributeSchema(name, optional as Optional);
+            }
+            case "element": {
+                return new ElementSchema(
+                    name,
+                    numberValueSchema,
+                    optional as Optional,
+                );
+            }
+        }
+    }
+    return numberValueSchema;
+}
+
+export function boolean(): ValueSchema<boolean>;
+
+export function boolean<Optional extends boolean = false>(
+    kind: "attribute",
+    name: string,
+    optional?: Optional,
+): AttributeSchema<boolean, Optional>;
+
+export function boolean<Optional extends boolean = false>(
+    kind: "element",
+    name: string,
+    optional?: Optional,
+): ElementSchema<boolean, Optional>;
+
+export function boolean<Optional extends boolean = false>(
+    kind?: "attribute" | "element",
+    name?: string,
+    optional?: Optional,
+):
+    | AttributeSchema<boolean, Optional>
+    | ValueSchema<boolean>
+    | ElementSchema<boolean, Optional> {
+    if (name !== undefined) {
+        switch (kind) {
+            case "attribute": {
+                return booleanAttributeSchema(name, optional as Optional);
+            }
+            case "element": {
+                return new ElementSchema(
+                    name,
+                    booleanValueSchema,
+                    optional as Optional,
+                );
+            }
+        }
+    }
+    return booleanValueSchema;
+}
+
+export function object<
+    S extends Record<
+        string,
+        AttributeSchema<unknown, boolean> | ElementSchema<unknown, boolean>
+    >,
+>(children: S): ObjectSchema<{ [K in keyof S]: Infer<S[K]> }>;
+
+export function object<
+    S extends Record<
+        string,
+        AttributeSchema<unknown, boolean> | ElementSchema<unknown, boolean>
+    >,
+    Optional extends boolean = false,
+>(
+    name: string,
     children: S,
-): RootableSchema<{ [K in keyof S]: Infer<S[K]> }> => {
-    return new ObjectSchema(children);
-};
+    optional?: Optional,
+): Schema<{ [K in keyof S]: Infer<S[K]> }, Optional>;
 
-export const array = <S extends Record<string, Schema<unknown>>>(
-    children: S,
-): RootableSchema<{ [K in keyof S]: Infer<S[K]> }[]> => {
-    return new ArraySchema(children);
-};
+export function object<
+    S extends Record<
+        string,
+        AttributeSchema<unknown, boolean> | ElementSchema<unknown, boolean>
+    >,
+    Optional extends boolean = false,
+>(
+    nameOrChildren: string | S,
+    children?: S,
+    optional?: Optional,
+):
+    | ObjectSchema<{ [K in keyof S]: Infer<S[K]> }>
+    | Schema<{ [K in keyof S]: Infer<S[K]> }, Optional> {
+    if (typeof nameOrChildren === "string") {
+        return new ElementSchema(
+            nameOrChildren as string,
+            new ObjectSchema(children as S),
+            optional as Optional,
+        ) as Schema<{ [K in keyof S]: Infer<S[K]> }, Optional>;
+    } else {
+        return new ObjectSchema(nameOrChildren as S) as ObjectSchema<{
+            [K in keyof S]: Infer<S[K]>;
+        }>;
+    }
+}
+
+export function array<T, Optional extends boolean = false>(
+    schema: Schema<T, boolean>,
+    optional?: Optional,
+): Schema<T[], Optional>;
+
+export function array<T, Optional extends boolean = false>(
+    name: string,
+    schema: Schema<T, boolean>,
+    optional?: Optional,
+): Schema<T[], Optional>;
+
+export function array<T, Optional extends boolean = false>(
+    nameOrSchema: string | Schema<T, boolean>,
+    schemaOrOptional?: Schema<T, boolean> | Optional,
+    optional?: Optional,
+): Schema<T[], false> | Schema<T[], Optional> {
+    if (typeof nameOrSchema === "string") {
+        return new ElementSchema(
+            nameOrSchema as string,
+            new ArraySchema(
+                schemaOrOptional as Schema<T, boolean>,
+                optional as Optional,
+            ),
+            optional as Optional,
+        ) as Schema<T[], Optional>;
+    } else {
+        return new ArraySchema(
+            nameOrSchema as Schema<T, boolean>,
+            schemaOrOptional as Optional,
+        );
+    }
+}
