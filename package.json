@@ -3,7 +3,28 @@
     "version": "0.1.0",
     "description": "A strongly typed XML parsing and manipulation library for TypeScript, providing type-safe XML handling capabilities",
     "author": "sya-ri",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.es.js",
+    "exports": {
+        ".": {
+            "import": "./dist/index.es.js",
+            "require": "./dist/index.cjs.js"
+        },
+        "./parser": {
+            "import": "./dist/parser.es.js",
+            "require": "./dist/parser.cjs.js"
+        },
+        "./schema": {
+            "import": "./dist/schema.es.js",
+            "require": "./dist/schema.cjs.js"
+        },
+        "./util": {
+            "import": "./dist/util.es.js",
+            "require": "./dist/util.cjs.js"
+        }
+    },
     "scripts": {
+        "build": "vite build",
         "test": "vitest",
         "test:coverage": "vitest --coverage",
         "check": "run-p check:*",
@@ -20,6 +41,7 @@
         "npm-run-all2": "8.0.4",
         "sort-package-json": "3.4.0",
         "typescript": "5.9.3",
+        "vite": "7.1.9",
         "vitest": "3.2.4"
     },
     "engines": {

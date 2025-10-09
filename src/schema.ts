@@ -25,8 +25,6 @@ export abstract class AbstractSchema<T, Optional extends boolean>
     }
 }
 
-export type Infer<S> = S extends Schema<infer T, boolean> ? T : never;
-
 export class AttributeSchema<
     T,
     Optional extends boolean,

@@ -4,7 +4,6 @@ import {
     booleanAttributeSchema,
     booleanValueSchema,
     ElementSchema,
-    type Infer,
     numberAttributeSchema,
     numberValueSchema,
     ObjectSchema,
@@ -15,17 +14,8 @@ import {
 } from "./schema";
 
 export * from "./error";
-export {
-    type NodeLike,
-    type ParseOptions,
-    parse,
-    parseStream,
-} from "./parser";
-export type {
-    AbstractSchema,
-    Infer,
-    Schema,
-} from "./schema";
+
+export type Infer<S> = S extends Schema<infer T, boolean> ? T : never;
 
 export function string(): ValueSchema<string>;
 
