@@ -38,7 +38,7 @@ describe.each([
             const optional = faker.datatype.boolean();
 
             // @ts-expect-error
-            const actual = fn(kind, "NAME", optional);
+            const actual = fn("NAME", kind, optional);
 
             expect(actual instanceof clazz).toBe(true);
             // @ts-expect-error name is private
@@ -53,43 +53,43 @@ describe.each([
 
 describe("tx.string", () => {
     it("should parse string from an attribute", async () => {
-        const schema = tx.string("attribute", "NAME");
+        const schema = tx.string("NAME", "attribute");
         const actual = await schema.parse("<root NAME='test'/>");
         expect(actual).toBe("test");
     });
 
     it("should parse optional string when missing", async () => {
-        const schema = tx.string("attribute", "VALUE", true);
+        const schema = tx.string("VALUE", "attribute", true);
         const actual = await schema.parse("<root></root>");
         expect(actual).toBeUndefined();
     });
 
     it("should parse string from an element", async () => {
-        const schema = tx.string("element", "VALUE");
+        const schema = tx.string("VALUE", "element");
         const actual = await schema.parse("<root><VALUE>test</VALUE></root>");
         expect(actual).toBe("test");
     });
 
     it("should parse optional string when missing", async () => {
-        const schema = tx.string("element", "VALUE", true);
+        const schema = tx.string("VALUE", "element", true);
         const actual = await schema.parse("<root></root>");
         expect(actual).toBeUndefined();
     });
 
     it("should handle empty string values", async () => {
-        const schema = tx.string("element", "VALUE");
+        const schema = tx.string("VALUE", "element");
         const actual = await schema.parse("<root><VALUE></VALUE></root>");
         expect(actual).toBe("");
     });
 
     it("should handle whitespace-only string values", async () => {
-        const schema = tx.string("element", "VALUE");
+        const schema = tx.string("VALUE", "element");
         const actual = await schema.parse("<root><VALUE>   </VALUE></root>");
         expect(actual).toBe("   ");
     });
 
     it("should keep special characters escaped in string values", async () => {
-        const schema = tx.string("element", "VALUE");
+        const schema = tx.string("VALUE", "element");
         const actual = await schema.parse(
             "<root><VALUE>&lt;test&gt;</VALUE></root>",
         );
@@ -97,84 +97,84 @@ describe("tx.string", () => {
     });
 
     it("should throw an error when the required attribute is missing", async () => {
-        const schema = tx.string("attribute", "ID");
+        const schema = tx.string("ID", "attribute");
         await expect(schema.parse("<root></root>")).rejects.toThrow();
     });
 
     it("should throw an error when a required element is missing", async () => {
-        const schema = tx.string("element", "NAME");
+        const schema = tx.string("NAME", "element");
         await expect(schema.parse("<root></root>")).rejects.toThrow();
     });
 });
 
 describe("tx.number", () => {
     it("should parse positive integer from an element", async () => {
-        const schema = tx.number("element", "NUM");
+        const schema = tx.number("NUM", "element");
         const actual = await schema.parse("<root><NUM>123</NUM></root>");
         expect(actual).toBe(123);
     });
 
     it("should parse a negative number from an element", async () => {
-        const schema = tx.number("element", "NUM");
+        const schema = tx.number("NUM", "element");
         const actual = await schema.parse("<root><NUM>-456</NUM></root>");
         expect(actual).toBe(-456);
     });
 
     it("should parse a decimal number from an element", async () => {
-        const schema = tx.number("element", "NUM");
+        const schema = tx.number("NUM", "element");
         const actual = await schema.parse("<root><NUM>123.45</NUM></root>");
         expect(actual).toBe(123.45);
     });
 
     it("should parse zero from an element", async () => {
-        const schema = tx.number("element", "NUM");
+        const schema = tx.number("NUM", "element");
         const actual = await schema.parse("<root><NUM>0</NUM></root>");
         expect(actual).toBe(0);
     });
 
     it("should parse number from an attribute", async () => {
-        const schema = tx.number("attribute", "VALUE");
+        const schema = tx.number("VALUE", "attribute");
         const actual = await schema.parse("<root VALUE='789'/>");
         expect(actual).toBe(789);
     });
 
     it("should parse the optional number when missing", async () => {
-        const schema = tx.number("element", "NUM", true);
+        const schema = tx.number("NUM", "element", true);
         const actual = await schema.parse("<root></root>");
         expect(actual).toBeUndefined();
     });
 
     it("should parse scientific notation numbers", async () => {
-        const schema = tx.number("element", "NUM");
+        const schema = tx.number("NUM", "element");
         const actual = await schema.parse("<root><NUM>1.23e10</NUM></root>");
         expect(actual).toBe(1.23e10);
     });
 
     it("should handle negative zero", async () => {
-        const schema = tx.number("element", "NUM");
+        const schema = tx.number("NUM", "element");
         const actual = await schema.parse("<root><NUM>-0</NUM></root>");
         expect(actual).toBe(-0);
     });
 
     it("should throw an error when the required attribute is missing", async () => {
-        const schema = tx.number("attribute", "ID");
+        const schema = tx.number("ID", "attribute");
         await expect(schema.parse("<root></root>")).rejects.toThrow();
     });
 
     it("should throw an error when a required element is missing", async () => {
-        const schema = tx.number("element", "NUM");
+        const schema = tx.number("NUM", "element");
         await expect(schema.parse("<root></root>")).rejects.toThrow();
     });
 
     it("should throw an error when number parsing fails", async () => {
-        const schema = tx.number("element", "NUM");
+        const schema = tx.number("NUM", "element");
         await expect(
             schema.parse("<root><NUM>invalid</NUM></root>"),
         ).rejects.toThrow();
     });
 
     it("should provide a clear error for invalid number format", async () => {
-        const schema = tx.number("element", "NUM");
+        const schema = tx.number("NUM", "element");
         await expect(
             schema.parse("<root><NUM>not-a-number</NUM></root>"),
         ).rejects.toThrow();
@@ -183,48 +183,48 @@ describe("tx.number", () => {
 
 describe("tx.boolean", () => {
     it("should parse true from an element", async () => {
-        const schema = tx.boolean("element", "FLAG");
+        const schema = tx.boolean("FLAG", "element");
         const actual = await schema.parse("<root><FLAG>true</FLAG></root>");
         expect(actual).toBe(true);
     });
 
     it("should parse false from an element", async () => {
-        const schema = tx.boolean("element", "FLAG");
+        const schema = tx.boolean("FLAG", "element");
         const actual = await schema.parse("<root><FLAG>false</FLAG></root>");
         expect(actual).toBe(false);
     });
 
     it("should parse boolean from an attribute", async () => {
-        const schema = tx.boolean("attribute", "ACTIVE");
+        const schema = tx.boolean("ACTIVE", "attribute");
         const actual = await schema.parse("<root ACTIVE='true'/>");
         expect(actual).toBe(true);
     });
 
     it("should parse optional boolean when missing", async () => {
-        const schema = tx.boolean("element", "FLAG", true);
+        const schema = tx.boolean("FLAG", "element", true);
         const actual = await schema.parse("<root></root>");
         expect(actual).toBeUndefined();
     });
 
     it("should throw an error when the required attribute is missing", async () => {
-        const schema = tx.boolean("attribute", "FLAG");
+        const schema = tx.boolean("FLAG", "attribute");
         await expect(schema.parse("<root></root>")).rejects.toThrow();
     });
 
     it("should throw an error when a required element is missing", async () => {
-        const schema = tx.boolean("element", "FLAG");
+        const schema = tx.boolean("FLAG", "element");
         await expect(schema.parse("<root></root>")).rejects.toThrow();
     });
 
     it("should throw an error when boolean parsing fails", async () => {
-        const schema = tx.boolean("element", "FLAG");
+        const schema = tx.boolean("FLAG", "element");
         await expect(
             schema.parse("<root><FLAG>invalid</FLAG></root>"),
         ).rejects.toThrow();
     });
 
     it("should provide a clear error for invalid boolean format", async () => {
-        const schema = tx.boolean("element", "FLAG");
+        const schema = tx.boolean("FLAG", "element");
         await expect(
             schema.parse("<root><FLAG>yes</FLAG></root>"),
         ).rejects.toThrow();
@@ -234,9 +234,9 @@ describe("tx.boolean", () => {
 describe("tx.object", () => {
     it("should parse an object", async () => {
         const schema = tx.object({
-            id: tx.string("attribute", "ID"),
-            str: tx.string("element", "STR"),
-            num: tx.number("element", "NUM"),
+            id: tx.string("ID", "attribute"),
+            str: tx.string("STR", "element"),
+            num: tx.number("NUM", "element"),
         });
         const actual = await schema.parse(
             "<root ID='abc123'><STR>Hello</STR><NUM>123</NUM></root>",
@@ -250,12 +250,12 @@ describe("tx.object", () => {
 
     it("should parse nested objects", async () => {
         const schema = tx.object({
-            id: tx.string("attribute", "ID"),
+            id: tx.string("ID", "attribute"),
             info: tx.object("INFO", {
-                name: tx.string("element", "NAME"),
+                name: tx.string("NAME", "element"),
                 details: tx.object("DETAILS", {
-                    age: tx.number("element", "AGE"),
-                    active: tx.boolean("element", "ACTIVE"),
+                    age: tx.number("AGE", "element"),
+                    active: tx.boolean("ACTIVE", "element"),
                 }),
             }),
         });
@@ -276,9 +276,9 @@ describe("tx.object", () => {
 
     it("should parse an object with optional fields present", async () => {
         const schema = tx.object({
-            id: tx.string("attribute", "ID"),
-            name: tx.string("element", "NAME"),
-            age: tx.number("element", "AGE", true),
+            id: tx.string("ID", "attribute"),
+            name: tx.string("NAME", "element"),
+            age: tx.number("AGE", "element", true),
         });
         const actual = await schema.parse(
             "<root ID='123'><NAME>John</NAME><AGE>30</AGE></root>",
@@ -292,9 +292,9 @@ describe("tx.object", () => {
 
     it("should parse an object with optional fields missing", async () => {
         const schema = tx.object({
-            id: tx.string("attribute", "ID"),
-            name: tx.string("element", "NAME"),
-            age: tx.number("element", "AGE", true),
+            id: tx.string("ID", "attribute"),
+            name: tx.string("NAME", "element"),
+            age: tx.number("AGE", "element", true),
         });
         const actual = await schema.parse(
             "<root ID='123'><NAME>John</NAME></root>",
@@ -308,10 +308,10 @@ describe("tx.object", () => {
 
     it("should parse an object with multiple attributes and elements", async () => {
         const schema = tx.object({
-            id: tx.string("attribute", "ID"),
-            type: tx.string("attribute", "TYPE"),
-            name: tx.string("element", "NAME"),
-            value: tx.number("element", "VALUE"),
+            id: tx.string("ID", "attribute"),
+            type: tx.string("TYPE", "attribute"),
+            name: tx.string("NAME", "element"),
+            value: tx.number("VALUE", "element"),
         });
         const actual = await schema.parse(
             "<root ID='abc' TYPE='test'><NAME>Test</NAME><VALUE>42</VALUE></root>",
@@ -326,11 +326,11 @@ describe("tx.object", () => {
 
     it("should parse an object with multiple nested levels and arrays", async () => {
         const schema = tx.object({
-            id: tx.string("attribute", "ID"),
+            id: tx.string("ID", "attribute"),
             metadata: tx.object("METADATA", {
                 tags: tx.array("TAGS", tx.string()),
                 properties: tx.object("PROPERTIES", {
-                    enabled: tx.boolean("element", "ENABLED"),
+                    enabled: tx.boolean("ENABLED", "element"),
                 }),
             }),
         });
@@ -350,8 +350,8 @@ describe("tx.object", () => {
 
     it("should throw an error when the required field is missing", async () => {
         const schema = tx.object({
-            id: tx.string("attribute", "ID"),
-            name: tx.string("element", "NAME"),
+            id: tx.string("ID", "attribute"),
+            name: tx.string("NAME", "element"),
         });
         await expect(schema.parse("<root ID='123'></root>")).rejects.toThrow();
     });
@@ -361,10 +361,10 @@ describe("tx.array", () => {
     it("should parse an array of objects", async () => {
         const schema = tx.array(
             tx.object({
-                id: tx.string("attribute", "ID"),
-                name: tx.string("element", "NAME"),
-                age: tx.number("element", "AGE"),
-                active: tx.boolean("element", "ACTIVE"),
+                id: tx.string("ID", "attribute"),
+                name: tx.string("NAME", "element"),
+                age: tx.number("AGE", "element"),
+                active: tx.boolean("ACTIVE", "element"),
             }),
         );
         const actual = await schema.parse(
@@ -395,9 +395,9 @@ describe("tx.array", () => {
     it("should parse a single object with a name", async () => {
         const schema = tx.array(
             tx.object({
-                id: tx.string("attribute", "ID"),
-                name: tx.string("element", "NAME"),
-                age: tx.number("element", "AGE"),
+                id: tx.string("ID", "attribute"),
+                name: tx.string("NAME", "element"),
+                age: tx.number("AGE", "element"),
             }),
         );
         const actual = await schema.parse(
@@ -445,7 +445,7 @@ describe("tx.array", () => {
     it("should parse an array of objects containing arrays", async () => {
         const schema = tx.array(
             tx.object({
-                id: tx.string("attribute", "ID"),
+                id: tx.string("ID", "attribute"),
                 tags: tx.array("TAGS", tx.string()),
             }),
         );

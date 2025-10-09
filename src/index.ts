@@ -20,20 +20,20 @@ export type Infer<S> = S extends Schema<infer T, boolean> ? T : never;
 export function string(): ValueSchema<string>;
 
 export function string<Optional extends boolean = false>(
-    kind: "attribute",
     name: string,
+    kind: "attribute",
     optional?: Optional,
 ): AttributeSchema<string, Optional>;
 
 export function string<Optional extends boolean = false>(
-    kind: "element",
     name: string,
+    kind: "element",
     optional?: Optional,
 ): ElementSchema<string, Optional>;
 
 export function string<Optional extends boolean = false>(
-    kind?: "attribute" | "element",
     name?: string,
+    kind?: "attribute" | "element",
     optional?: Optional,
 ):
     | AttributeSchema<string, Optional>
@@ -56,20 +56,20 @@ export function string<Optional extends boolean = false>(
 export function number(): ValueSchema<number>;
 
 export function number<Optional extends boolean = false>(
-    kind: "attribute",
     name: string,
+    kind: "attribute",
     optional?: Optional,
 ): AttributeSchema<number, Optional>;
 
 export function number<Optional extends boolean = false>(
-    kind: "element",
     name: string,
+    kind: "element",
     optional?: Optional,
 ): ElementSchema<number, Optional>;
 
 export function number<Optional extends boolean = false>(
-    kind?: "attribute" | "element",
     name?: string,
+    kind?: "attribute" | "element",
     optional?: Optional,
 ):
     | AttributeSchema<number, Optional>
@@ -95,20 +95,20 @@ export function number<Optional extends boolean = false>(
 export function boolean(): ValueSchema<boolean>;
 
 export function boolean<Optional extends boolean = false>(
-    kind: "attribute",
     name: string,
+    kind: "attribute",
     optional?: Optional,
 ): AttributeSchema<boolean, Optional>;
 
 export function boolean<Optional extends boolean = false>(
-    kind: "element",
     name: string,
+    kind: "element",
     optional?: Optional,
 ): ElementSchema<boolean, Optional>;
 
 export function boolean<Optional extends boolean = false>(
-    kind?: "attribute" | "element",
     name?: string,
+    kind?: "attribute" | "element",
     optional?: Optional,
 ):
     | AttributeSchema<boolean, Optional>
