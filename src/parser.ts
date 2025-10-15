@@ -13,28 +13,25 @@ export function parse(xml: string): NodeLike {
 }
 
 class XMLParser {
-    private s: string;
     private i = 0;
 
-    constructor(src: string) {
-        this.s = src;
-    }
+    constructor(private readonly src: string) {}
 
     private eof(): boolean {
-        return this.s.length <= this.i;
+        return this.src.length <= this.i;
     }
 
     private next(): string | unknown {
-        const ch = this.s[this.i];
+        const ch = this.src[this.i];
         this.i++;
         return ch;
     }
 
     private startsWith(str: string): boolean {
         const len = str.length;
-        if (this.i + len > this.s.length) return false;
+        if (this.i + len > this.src.length) return false;
         for (let j = 0; j < len; j++) {
-            if (this.s.charCodeAt(this.i + j) !== str.charCodeAt(j)) {
+            if (this.src.charCodeAt(this.i + j) !== str.charCodeAt(j)) {
                 return false;
             }
         }
@@ -43,8 +40,8 @@ class XMLParser {
 
     private error(msg: string): never {
         const from = Math.max(0, this.i - 40);
-        const to = Math.min(this.s.length, this.i + 40);
-        const excerpt = this.s.slice(from, to).replace(/\n/g, "\\n");
+        const to = Math.min(this.src.length, this.i + 40);
+        const excerpt = this.src.slice(from, to).replace(/\n/g, "\\n");
         throw new ParseError(`${msg} at ${this.i}. Near: "${excerpt}"`);
     }
 
@@ -68,8 +65,8 @@ class XMLParser {
     }
 
     private skipWS() {
-        while (this.i < this.s.length) {
-            const code = this.s.charCodeAt(this.i);
+        while (this.i < this.src.length) {
+            const code = this.src.charCodeAt(this.i);
             // space(32), tab(9), newline(10), carriage return(13)
             if (code !== 32 && code !== 9 && code !== 10 && code !== 13) break;
             this.i++;
@@ -82,38 +79,38 @@ class XMLParser {
     }
 
     private readUntil(token: string): string {
-        const idx = this.s.indexOf(token, this.i);
+        const idx = this.src.indexOf(token, this.i);
         if (idx < 0) this.error(`Expected "${token}"`);
-        const chunk = this.s.slice(this.i, idx);
+        const chunk = this.src.slice(this.i, idx);
         this.i = idx + token.length;
         return chunk;
     }
 
     private readName(): string {
-        const startCode = this.s.charCodeAt(this.i);
+        const startCode = this.src.charCodeAt(this.i);
         if (!this.isNameStartChar(startCode)) this.error(`Invalid name start`);
         const start = this.i++;
         while (
-            this.i < this.s.length &&
-            this.isNameChar(this.s.charCodeAt(this.i))
+            this.i < this.src.length &&
+            this.isNameChar(this.src.charCodeAt(this.i))
         ) {
             this.i++;
         }
-        return this.s.slice(start, this.i);
+        return this.src.slice(start, this.i);
     }
 
     private readAttrValue(): string {
         this.skipWS();
-        const q = this.s[this.i];
+        const q = this.src[this.i];
         if (q !== `"` && q !== `'`)
             this.error("Expected quoted attribute value");
         this.i++;
         const start = this.i;
-        while (this.i < this.s.length && this.s[this.i] !== q) {
+        while (this.i < this.src.length && this.src[this.i] !== q) {
             this.i++;
         }
-        if (this.i >= this.s.length) this.error("Unclosed attribute value");
-        const val = this.s.slice(start, this.i);
+        if (this.i >= this.src.length) this.error("Unclosed attribute value");
+        const val = this.src.slice(start, this.i);
         this.i++;
         return val;
     }
@@ -174,7 +171,7 @@ class XMLParser {
 
         while (true) {
             this.skipWS();
-            const ch = this.s[this.i];
+            const ch = this.src[this.i];
             if (ch === "/" || ch === ">") break;
             const name = this.readName();
             this.skipWS();
@@ -222,17 +219,17 @@ class XMLParser {
                 continue;
             }
 
-            const ch = this.s[this.i];
+            const ch = this.src[this.i];
             if (ch === "<") {
                 const child = this.parseElement(depth + 1);
                 children.push(child);
             } else {
-                const idx = this.s.indexOf("<", this.i);
+                const idx = this.src.indexOf("<", this.i);
                 if (idx < 0) {
-                    text += this.s.slice(this.i);
-                    this.i = this.s.length;
+                    text += this.src.slice(this.i);
+                    this.i = this.src.length;
                 } else {
-                    text += this.s.slice(this.i, idx);
+                    text += this.src.slice(this.i, idx);
                     this.i = idx;
                 }
             }
