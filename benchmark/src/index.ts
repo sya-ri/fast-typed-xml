@@ -64,12 +64,12 @@ const main = async () => {
     });
 
     bench.add("typed-xml (parse only)", async () => {
-        await txParser.parse(xml);
+        txParser.parse(xml);
     });
 
     let txResult: unknown;
     bench.add("typed-xml", async () => {
-        txResult = await schema.parse(xml);
+        txResult = schema.parse(xml);
     });
 
     await bench.run();

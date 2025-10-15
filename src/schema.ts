@@ -8,7 +8,7 @@ export interface Schema<T, Optional extends boolean> {
     parse: (
         xml: string,
         options?: ParseOptions,
-    ) => Promise<Optional extends true ? T | undefined : T>;
+    ) => Optional extends true ? T | undefined : T;
 }
 
 export abstract class AbstractSchema<T, Optional extends boolean>
@@ -16,11 +16,11 @@ export abstract class AbstractSchema<T, Optional extends boolean>
 {
     abstract decode(node: NodeLike): Optional extends true ? T | undefined : T;
 
-    async parse(
+    parse(
         xml: string,
         options?: ParseOptions,
-    ): Promise<Optional extends true ? T | undefined : T> {
-        const node = await parse(xml, options);
+    ): Optional extends true ? T | undefined : T {
+        const node = parse(xml, options);
         return this.decode(node);
     }
 }
