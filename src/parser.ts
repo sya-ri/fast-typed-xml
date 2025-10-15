@@ -75,7 +75,31 @@ class XMLParser {
     }
 
     private skipWSSync() {
-        while (!this.eof() && /\s/.test(this.s[this.i] ?? "")) this.i++;
+        while (this.i < this.s.length) {
+            const code = this.s.charCodeAt(this.i);
+            // space(32), tab(9), newline(10), carriage return(13)
+            if (code !== 32 && code !== 9 && code !== 10 && code !== 13) break;
+            this.i++;
+        }
+    }
+
+    private isNameStartChar(code: number): boolean {
+        return (
+            (code >= 65 && code <= 90) || // A-Z
+            (code >= 97 && code <= 122) || // a-z
+            code === 95 // _
+        );
+    }
+
+    private isNameChar(code: number): boolean {
+        return (
+            (code >= 48 && code <= 57) || // 0-9
+            (code >= 65 && code <= 90) || // A-Z
+            (code >= 97 && code <= 122) || // a-z
+            code === 46 || // .
+            code === 95 || // _
+            code === 45 // -
+        );
     }
 
     private skipWS() {
@@ -96,15 +120,13 @@ class XMLParser {
     }
 
     private readName(): string {
-        const startCh = this.s[this.i];
-        if (!startCh || !/[A-Za-z_]/.test(startCh))
-            this.error(`Invalid name start "${startCh ?? ""}"`);
+        const startCode = this.s.charCodeAt(this.i);
+        if (!this.isNameStartChar(startCode)) this.error(`Invalid name start`);
         const start = this.i++;
-        while (true) {
-            const c = this.s[this.i];
-            if (c === undefined || !/[A-Za-z0-9._-]/.test(c)) {
-                break;
-            }
+        while (
+            this.i < this.s.length &&
+            this.isNameChar(this.s.charCodeAt(this.i))
+        ) {
             this.i++;
         }
         return this.s.slice(start, this.i);
