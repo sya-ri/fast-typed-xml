@@ -168,10 +168,6 @@ class XMLParser {
         this.skipMisc();
         const root = this.parseElement(0);
         this.skipMisc();
-        if (1 << 14 < this.i) {
-            this.s = this.s.slice(this.i);
-            this.i = 0;
-        }
         return root;
     }
 
@@ -256,10 +252,6 @@ class XMLParser {
         const text = this.trimText ? textBuf.trim() : textBuf;
         if (children.length) node.children = children;
         if (text?.length) node.text = text;
-        if (1 << 14 < this.i) {
-            this.s = this.s.slice(this.i);
-            this.i = 0;
-        }
         return node;
     }
 }
