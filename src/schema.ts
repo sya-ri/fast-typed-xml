@@ -1,5 +1,5 @@
 import { InvalidInputError } from "./error";
-import { type NodeLike, type ParseOptions, parse } from "./parser";
+import { type NodeLike, parse } from "./parser";
 import { getChild, parseBooleanOrFail, parseNumberOrFail } from "./util";
 
 export interface Schema<T, Optional extends boolean> {
@@ -7,7 +7,6 @@ export interface Schema<T, Optional extends boolean> {
 
     parse: (
         xml: string,
-        options?: ParseOptions,
     ) => Optional extends true ? T | undefined : T;
 }
 
@@ -18,9 +17,8 @@ export abstract class AbstractSchema<T, Optional extends boolean>
 
     parse(
         xml: string,
-        options?: ParseOptions,
     ): Optional extends true ? T | undefined : T {
-        const node = parse(xml, options);
+        const node = parse(xml);
         return this.decode(node);
     }
 }

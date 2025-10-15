@@ -7,26 +7,17 @@ export type NodeLike = {
     text?: string;
 };
 
-export type ParseOptions = {
-    /**
-     * If true, trims text nodes (outside CDATA)
-     */
-    trimText?: boolean;
-};
-
-export function parse(xml: string, options: ParseOptions = {}): NodeLike {
-    const parser = new XMLParser(xml, options);
+export function parse(xml: string): NodeLike {
+    const parser = new XMLParser(xml);
     return parser.parseDocument();
 }
 
 class XMLParser {
     private s: string;
     private i = 0;
-    private readonly trimText: boolean;
 
-    constructor(src: string, options: ParseOptions) {
+    constructor(src: string) {
         this.s = src;
-        this.trimText = options.trimText ?? false;
     }
 
     private eof(): boolean {
@@ -202,7 +193,7 @@ class XMLParser {
 
         this.expect(">");
         const children: NodeLike[] = [];
-        let textBuf = "";
+        let text = "";
 
         while (true) {
             if (this.eof()) this.error(`Unclosed element <${name}>`);
@@ -223,7 +214,7 @@ class XMLParser {
             }
             if (this.startsWith("<![CDATA[")) {
                 this.i += "<![CDATA[".length;
-                textBuf += this.readUntil("]]>");
+                text += this.readUntil("]]>");
                 continue;
             }
             if (this.startsWith("<?")) {
@@ -238,10 +229,10 @@ class XMLParser {
             } else {
                 const idx = this.s.indexOf("<", this.i);
                 if (idx < 0) {
-                    textBuf += this.s.slice(this.i);
+                    text += this.s.slice(this.i);
                     this.i = this.s.length;
                 } else {
-                    textBuf += this.s.slice(this.i, idx);
+                    text += this.s.slice(this.i, idx);
                     this.i = idx;
                 }
             }
@@ -249,7 +240,6 @@ class XMLParser {
 
         const node: NodeLike = { name };
         if (attrCount) node.attributes = attributes;
-        const text = this.trimText ? textBuf.trim() : textBuf;
         if (children.length) node.children = children;
         if (text?.length) node.text = text;
         return node;
