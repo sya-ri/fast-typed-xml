@@ -64,7 +64,14 @@ class XMLParser {
     }
 
     private startsWith(str: string): boolean {
-        return this.s.startsWith(str, this.i);
+        const len = str.length;
+        if (this.i + len > this.s.length) return false;
+        for (let j = 0; j < len; j++) {
+            if (this.s.charCodeAt(this.i + j) !== str.charCodeAt(j)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private error(msg: string): never {
