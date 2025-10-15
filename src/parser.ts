@@ -12,24 +12,6 @@ export type ParseOptions = {
      * If true, trims text nodes (outside CDATA)
      */
     trimText?: boolean;
-
-    /**
-     * Maximum element nesting depth
-     * @default 64
-     */
-    maxDepth?: number;
-
-    /**
-     * Maximum number of children per element
-     * @default 2000
-     */
-    maxChildren?: number;
-
-    /**
-     * Maximum number of attributes per element
-     * @default 128
-     */
-    maxAttributes?: number;
 };
 
 export function parse(xml: string, options: ParseOptions = {}): NodeLike {
@@ -41,16 +23,10 @@ class XMLParser {
     private s: string;
     private i = 0;
     private readonly trimText: boolean;
-    private readonly maxDepth: number;
-    private readonly maxChildren: number;
-    private readonly maxAttributes: number;
 
     constructor(src: string, options: ParseOptions) {
         this.s = src;
         this.trimText = options.trimText ?? false;
-        this.maxDepth = options.maxDepth ?? 64;
-        this.maxChildren = options.maxChildren ?? 2000;
-        this.maxAttributes = options.maxAttributes ?? 128;
     }
 
     private eof(): boolean {
@@ -81,15 +57,6 @@ class XMLParser {
         throw new ParseError(`${msg} at ${this.i}. Near: "${excerpt}"`);
     }
 
-    private skipWSSync() {
-        while (this.i < this.s.length) {
-            const code = this.s.charCodeAt(this.i);
-            // space(32), tab(9), newline(10), carriage return(13)
-            if (code !== 32 && code !== 9 && code !== 10 && code !== 13) break;
-            this.i++;
-        }
-    }
-
     private isNameStartChar(code: number): boolean {
         return (
             (code >= 65 && code <= 90) || // A-Z
@@ -110,7 +77,12 @@ class XMLParser {
     }
 
     private skipWS() {
-        this.skipWSSync();
+        while (this.i < this.s.length) {
+            const code = this.s.charCodeAt(this.i);
+            // space(32), tab(9), newline(10), carriage return(13)
+            if (code !== 32 && code !== 9 && code !== 10 && code !== 13) break;
+            this.i++;
+        }
     }
 
     private expect(x: string) {
@@ -204,7 +176,6 @@ class XMLParser {
     }
 
     private parseElement(depth: number): NodeLike {
-        if (this.maxDepth < depth) this.error("Depth limit exceeded");
         this.skipWS();
         if (!this.startsWith("<")) {
             this.error("Expected element start '<'");
@@ -222,8 +193,7 @@ class XMLParser {
             this.skipWS();
             this.expect("=");
             attributes[name] = this.readAttrValue();
-            if (this.maxAttributes < ++attrCount)
-                this.error("Too many attributes");
+            ++attrCount;
         }
 
         this.skipWS();
@@ -269,8 +239,6 @@ class XMLParser {
             if (ch === "<") {
                 const child = this.parseElement(depth + 1);
                 children.push(child);
-                if (this.maxChildren < children.length)
-                    this.error("Too many children");
             } else {
                 const idx = this.s.indexOf("<", this.i);
                 if (idx < 0) {
