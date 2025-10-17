@@ -340,6 +340,34 @@ describe("tx.object", () => {
         });
     });
 
+    it("should parse nested objects with named wrappers", () => {
+        const schema = tx.object({
+            user: tx.object("USER", {
+                info: tx.object("INFO", {
+                    name: tx.string("NAME", "element"),
+                    age: tx.number("AGE", "element"),
+                }),
+                settings: tx.object("SETTINGS", {
+                    active: tx.boolean("ACTIVE", "element"),
+                }),
+            }),
+        });
+        const actual = schema.parse(
+            "<root><USER><INFO><NAME>John</NAME><AGE>30</AGE></INFO><SETTINGS><ACTIVE>true</ACTIVE></SETTINGS></USER></root>",
+        );
+        expect(actual).toEqual({
+            user: {
+                info: {
+                    name: "John",
+                    age: 30,
+                },
+                settings: {
+                    active: true,
+                },
+            },
+        });
+    });
+
     it("should throw an error when the required field is missing", () => {
         const schema = tx.object({
             id: tx.string("ID", "attribute"),
@@ -447,6 +475,63 @@ describe("tx.array", () => {
         expect(actual).toEqual([
             { id: "1", tags: ["a", "b"] },
             { id: "2", tags: ["c"] },
+        ]);
+    });
+
+    it("should parse nested arrays", () => {
+        const schema = tx.array(tx.array(tx.string()));
+        const actual = schema.parse(
+            "<root><GROUP><VALUE>a</VALUE><VALUE>b</VALUE></GROUP><GROUP><VALUE>c</VALUE><VALUE>d</VALUE></GROUP></root>",
+        );
+        expect(actual).toEqual([
+            ["a", "b"],
+            ["c", "d"],
+        ]);
+    });
+
+    it("should parse nested arrays in object", () => {
+        const schema = tx.object({
+            groups: tx.array("GROUPS", tx.array(tx.string())),
+        });
+        const actual = schema.parse(
+            "<root><GROUPS><GROUP><VALUE>a</VALUE><VALUE>b</VALUE></GROUP><GROUP><VALUE>c</VALUE><VALUE>d</VALUE></GROUP></GROUPS></root>",
+        );
+        expect(actual).toEqual({
+            groups: [
+                ["a", "b"],
+                ["c", "d"],
+            ],
+        });
+    });
+
+    it("should parse multiple array items with nested objects", () => {
+        const schema = tx.array(
+            tx.object({
+                name: tx.string("NAME", "element"),
+                details: tx.object("DETAILS", {
+                    age: tx.number("AGE", "element"),
+                    active: tx.boolean("ACTIVE", "element"),
+                }),
+            }),
+        );
+        const actual = schema.parse(
+            "<root><USER><NAME>John</NAME><DETAILS><AGE>30</AGE><ACTIVE>true</ACTIVE></DETAILS></USER><USER><NAME>Jane</NAME><DETAILS><AGE>25</AGE><ACTIVE>false</ACTIVE></DETAILS></USER></root>",
+        );
+        expect(actual).toEqual([
+            {
+                name: "John",
+                details: {
+                    age: 30,
+                    active: true,
+                },
+            },
+            {
+                name: "Jane",
+                details: {
+                    age: 25,
+                    active: false,
+                },
+            },
         ]);
     });
 
