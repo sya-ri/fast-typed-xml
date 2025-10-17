@@ -134,14 +134,18 @@ export function boolean<Optional extends boolean = false>(
 export function object<
     S extends Record<
         string,
-        AttributeSchema<unknown, boolean> | ElementSchema<unknown, boolean>
+        | AttributeSchema<unknown, boolean>
+        | ElementSchema<unknown, boolean>
+        | ArraySchema<unknown, true, boolean>
     >,
 >(children: S): ObjectSchema<{ [K in keyof S]: Infer<S[K]> }>;
 
 export function object<
     S extends Record<
         string,
-        AttributeSchema<unknown, boolean> | ElementSchema<unknown, boolean>
+        | AttributeSchema<unknown, boolean>
+        | ElementSchema<unknown, boolean>
+        | ArraySchema<unknown, true, boolean>
     >,
     Optional extends boolean = false,
 >(
@@ -153,7 +157,9 @@ export function object<
 export function object<
     S extends Record<
         string,
-        AttributeSchema<unknown, boolean> | ElementSchema<unknown, boolean>
+        | AttributeSchema<unknown, boolean>
+        | ElementSchema<unknown, boolean>
+        | ArraySchema<unknown, true, boolean>
     >,
     Optional extends boolean = false,
 >(
@@ -179,23 +185,26 @@ export function object<
 export function array<T, Optional extends boolean = false>(
     schema: ValueSchema<T>,
     optional?: Optional,
-): ArraySchema<T, Optional>;
+): ArraySchema<T, false, Optional>;
 
 export function array<
     T extends Record<string, unknown>,
     Optional extends boolean = false,
->(schema: ObjectSchema<T>, optional?: Optional): ArraySchema<T, Optional>;
+>(
+    schema: ObjectSchema<T>,
+    optional?: Optional,
+): ArraySchema<T, false, Optional>;
 
 export function array<T, Optional extends boolean = false>(
-    schema: ArraySchema<T, Optional>,
+    schema: ArraySchema<T, false, Optional>,
     optional?: Optional,
-): ArraySchema<T, Optional>;
+): ArraySchema<T, false, Optional>;
 
 export function array<T, Optional extends boolean = false>(
     name: string,
-    schema: ArraySchema<T, Optional> | ValueSchema<T>,
+    schema: ArraySchema<T, false, Optional> | ValueSchema<T>,
     optional?: Optional,
-): ElementSchema<T[], Optional>;
+): ArraySchema<T, true, Optional>;
 
 export function array<
     T extends Record<string, unknown>,
@@ -204,24 +213,22 @@ export function array<
     name: string,
     schema: ObjectSchema<T>,
     optional?: Optional,
-): ElementSchema<T, Optional>;
+): ArraySchema<T, true, Optional>;
 
 export function array<T, Optional extends boolean = false>(
     nameOrSchema: string | Schema<T, boolean>,
     schemaOrOptional?: Schema<T, boolean> | Optional,
     optional?: Optional,
-): ArraySchema<T, Optional> | ElementSchema<T[], Optional> {
+): ArraySchema<T, boolean, Optional> {
     if (typeof nameOrSchema === "string") {
-        return new ElementSchema(
+        return new ArraySchema(
             nameOrSchema as string,
-            new ArraySchema(
-                schemaOrOptional as Schema<T, boolean>,
-                optional as Optional,
-            ),
+            schemaOrOptional as Schema<T, boolean>,
             optional as Optional,
-        ) as ElementSchema<T[], Optional>;
+        );
     } else {
         return new ArraySchema(
+            undefined,
             nameOrSchema as Schema<T, boolean>,
             schemaOrOptional as Optional,
         );

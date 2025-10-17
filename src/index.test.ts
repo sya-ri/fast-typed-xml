@@ -320,7 +320,9 @@ describe("tx.object", () => {
         const schema = tx.object({
             id: tx.string("ID", "attribute"),
             metadata: tx.object("METADATA", {
-                tags: tx.array("TAGS", tx.string()),
+                tags: tx.object("TAGS", {
+                    tag: tx.array("TAG", tx.string()),
+                }),
                 properties: tx.object("PROPERTIES", {
                     enabled: tx.boolean("ENABLED", "element"),
                 }),
@@ -328,6 +330,32 @@ describe("tx.object", () => {
         });
         const actual = schema.parse(
             "<root ID='xyz'><METADATA><TAGS><TAG>foo</TAG><TAG>bar</TAG></TAGS><PROPERTIES><ENABLED>true</ENABLED></PROPERTIES></METADATA></root>",
+        );
+        expect(actual).toEqual({
+            id: "xyz",
+            metadata: {
+                tags: {
+                    tag: ["foo", "bar"],
+                },
+                properties: {
+                    enabled: true,
+                },
+            },
+        });
+    });
+
+    it("should parse an object with multiple nested levels and arrays", () => {
+        const schema = tx.object({
+            id: tx.string("ID", "attribute"),
+            metadata: tx.object("METADATA", {
+                tags: tx.array("TAG", tx.string()),
+                properties: tx.object("PROPERTIES", {
+                    enabled: tx.boolean("ENABLED", "element"),
+                }),
+            }),
+        });
+        const actual = schema.parse(
+            "<root ID='xyz'><METADATA><TAG>foo</TAG><TAG>bar</TAG><PROPERTIES><ENABLED>true</ENABLED></PROPERTIES></METADATA></root>",
         );
         expect(actual).toEqual({
             id: "xyz",
@@ -374,6 +402,15 @@ describe("tx.object", () => {
             name: tx.string("NAME", "element"),
         });
         expect(() => schema.parse("<root ID='123'></root>")).toThrow();
+    });
+
+    it("should throw an error when multiple matching objects are found", () => {
+        const schema = tx.object({
+            name: tx.string("NAME", "element"),
+        });
+        expect(() =>
+            schema.parse("<root><NAME>First</NAME><NAME>Second</NAME></root>"),
+        ).toThrow();
     });
 });
 
@@ -466,11 +503,11 @@ describe("tx.array", () => {
         const schema = tx.array(
             tx.object({
                 id: tx.string("ID", "attribute"),
-                tags: tx.array("TAGS", tx.string()),
+                tags: tx.array("TAG", tx.string()),
             }),
         );
         const actual = schema.parse(
-            "<root><item ID='1'><TAGS><TAG>a</TAG><TAG>b</TAG></TAGS></item><item ID='2'><TAGS><TAG>c</TAG></TAGS></item></root>",
+            "<root><item ID='1'><TAG>a</TAG><TAG>b</TAG></item><item ID='2'><TAG>c</TAG></item></root>",
         );
         expect(actual).toEqual([
             { id: "1", tags: ["a", "b"] },
@@ -491,10 +528,10 @@ describe("tx.array", () => {
 
     it("should parse nested arrays in object", () => {
         const schema = tx.object({
-            groups: tx.array("GROUPS", tx.array(tx.string())),
+            groups: tx.array("GROUP", tx.array(tx.string())),
         });
         const actual = schema.parse(
-            "<root><GROUPS><GROUP><VALUE>a</VALUE><VALUE>b</VALUE></GROUP><GROUP><VALUE>c</VALUE><VALUE>d</VALUE></GROUP></GROUPS></root>",
+            "<root><GROUP><VALUE>a</VALUE><VALUE>b</VALUE></GROUP><GROUP><VALUE>c</VALUE><VALUE>d</VALUE></GROUP></root>",
         );
         expect(actual).toEqual({
             groups: [

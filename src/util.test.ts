@@ -8,7 +8,7 @@ describe("getChild", () => {
             name: "parent",
             children: [{ name: "child1" }, { name: "child2" }],
         };
-        expect(getChild(node, "child1")).toEqual({ name: "child1" });
+        expect(getChild(node, "child1", true)).toEqual({ name: "child1" });
     });
 
     it("should return undefined for non-existing child", () => {
@@ -16,14 +16,14 @@ describe("getChild", () => {
             name: "parent",
             children: [{ name: "child1" }],
         };
-        expect(getChild(node, "non-existing")).toBeUndefined();
+        expect(getChild(node, "non-existing", true)).toBeUndefined();
     });
 
     it("should return undefined for node without children", () => {
         const node: NodeLike = {
             name: "parent",
         };
-        expect(getChild(node, "any")).toBeUndefined();
+        expect(getChild(node, "any", true)).toBeUndefined();
     });
 });
 

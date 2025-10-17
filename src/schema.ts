@@ -1,13 +1,12 @@
 import { InvalidInputError } from "./error";
+import { boolean } from "./index";
 import { type NodeLike, parse } from "./parser";
 import { getChild, parseBooleanOrFail, parseNumberOrFail } from "./util";
 
 export interface Schema<T, Optional extends boolean> {
     decode: (node: NodeLike) => Optional extends true ? T | undefined : T;
 
-    parse: (
-        xml: string,
-    ) => Optional extends true ? T | undefined : T;
+    parse: (xml: string) => Optional extends true ? T | undefined : T;
 }
 
 export abstract class AbstractSchema<T, Optional extends boolean>
@@ -15,9 +14,7 @@ export abstract class AbstractSchema<T, Optional extends boolean>
 {
     abstract decode(node: NodeLike): Optional extends true ? T | undefined : T;
 
-    parse(
-        xml: string,
-    ): Optional extends true ? T | undefined : T {
+    parse(xml: string): Optional extends true ? T | undefined : T {
         const node = parse(xml);
         return this.decode(node);
     }
@@ -96,7 +93,7 @@ export class ElementSchema<T, Optional extends boolean> extends AbstractSchema<
     }
 
     decode(node: NodeLike): Optional extends true ? T | undefined : T {
-        const child = getChild(node, this.name);
+        const child = getChild(node, this.name, true);
         if (child === undefined) {
             if (this.optional) {
                 // @ts-expect-error returns undefined when optional is true
@@ -117,7 +114,9 @@ export class ObjectSchema<
     constructor(
         private readonly children: Record<
             string,
-            AttributeSchema<unknown, boolean> | ElementSchema<unknown, boolean>
+            | AttributeSchema<unknown, boolean>
+            | ElementSchema<unknown, boolean>
+            | ArraySchema<unknown, true, boolean>
         >,
     ) {
         super();
@@ -135,11 +134,13 @@ export class ObjectSchema<
     }
 }
 
-export class ArraySchema<T, Optional extends boolean> extends AbstractSchema<
-    T[],
-    Optional
-> {
+export class ArraySchema<
+    T,
+    IsElement extends boolean,
+    Optional extends boolean,
+> extends AbstractSchema<T[], Optional> {
     constructor(
+        private readonly name: IsElement extends true ? string : undefined,
         private readonly schema: Schema<T, boolean>,
         private readonly optional: Optional,
     ) {
@@ -147,7 +148,10 @@ export class ArraySchema<T, Optional extends boolean> extends AbstractSchema<
     }
 
     decode(node: NodeLike): Optional extends true ? T[] | undefined : T[] {
-        const children = node.children;
+        const children =
+            this.name !== undefined
+                ? getChild(node, this.name, false)
+                : node.children;
         if (children === undefined) {
             if (this.optional) {
                 // @ts-expect-error returns undefined when optional is true

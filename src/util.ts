@@ -1,11 +1,30 @@
 import { InvalidInputError } from "./error";
 import type { NodeLike } from "./parser";
 
-export const getChild = (
+export const getChild = <Single extends boolean>(
     node: NodeLike,
     name: string,
-): NodeLike | undefined => {
-    return node.children?.find((v) => v.name === name);
+    single: Single,
+): (Single extends true ? NodeLike : NodeLike[]) | undefined => {
+    const match = node.children?.filter((v) => v.name === name);
+    if (single) {
+        if (match === undefined) {
+            return undefined;
+        }
+
+        const length = match.length;
+        if (1 < length) {
+            throw new InvalidInputError(
+                `Expected zero or one element (found ${length}): ${name}`,
+            );
+        }
+
+        // @ts-expect-error returns a single element when single is true
+        return match[0];
+    }
+
+    // @ts-expect-error returns multiple elements when single is false
+    return match;
 };
 
 export const parseNumberOrFail = (value: string): number => {
