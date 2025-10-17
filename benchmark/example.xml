@@ -4,6 +4,8 @@
         <author>Gambardella, Matthew</author>
         <title>XML Developer's Guide</title>
         <genre>Computer</genre>
+        <genre>Programming</genre>
+        <genre>Reference</genre>
         <price>44.95</price>
         <publish_date>2000-10-01</publish_date>
         <description>An in-depth look at creating applications with XML.</description>
@@ -12,6 +14,8 @@
         <author>Ralls, Kim</author>
         <title>Midnight Rain</title>
         <genre>Fantasy</genre>
+        <genre>Adventure</genre>
+        <genre>Fiction</genre>
         <price>5.95</price>
         <publish_date>2000-12-16</publish_date>
         <description>A former architect battles corporate zombies, an evil sorceress, and her own childhood to become queen of the world.</description>
@@ -44,6 +48,8 @@
         <author>Randall, Cynthia</author>
         <title>Lover Birds</title>
         <genre>Romance</genre>
+        <genre>Contemporary</genre>
+        <genre>Fiction</genre>
         <price>4.95</price>
         <publish_date>2000-09-02</publish_date>
         <description>When Carla meets Paul at an ornithology conference, tempers fly as feathers get ruffled.</description>
@@ -60,6 +66,8 @@
         <author>Knorr, Stefan</author>
         <title>Creepy Crawlies</title>
         <genre>Horror</genre>
+        <genre>Thriller</genre>
+        <genre>Fiction</genre>
         <price>4.95</price>
         <publish_date>2000-12-06</publish_date>
         <description>An anthology of horror stories about roaches, centipedes, scorpions and other insects.</description>
@@ -68,6 +76,8 @@
         <author>Kress, Peter</author>
         <title>Paradox Lost</title>
         <genre>Science Fiction</genre>
+        <genre>Adventure</genre>
+        <genre>Fiction</genre>
         <price>6.95</price>
         <publish_date>2000-11-02</publish_date>
         <description>After an inadvertant trip through a Heisenberg Uncertainty Device, James Salway discovers the problems of being quantum.</description>
@@ -76,6 +86,8 @@
         <author>O'Brien, Tim</author>
         <title>Microsoft .NET: The Programming Bible</title>
         <genre>Computer</genre>
+        <genre>Technical</genre>
+        <genre>Reference</genre>
         <price>36.95</price>
         <publish_date>2000-12-09</publish_date>
         <description>Microsoft's .NET initiative is explored in detail in this deep programmer's reference.</description>

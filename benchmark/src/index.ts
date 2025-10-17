@@ -18,7 +18,7 @@ const schema = tx.array(
         id: tx.string("id", "attribute"),
         author: tx.string("author", "element"),
         title: tx.string("title", "element"),
-        genre: tx.string("genre", "element"),
+        genre: tx.array("genre", tx.string()),
         price: tx.number("price", "element"),
         publish_date: tx.string("publish_date", "element"),
         description: tx.string("description", "element"),
@@ -38,7 +38,7 @@ const main = async () => {
             id: book["@_id"],
             author: book.author,
             title: book.title,
-            genre: book.genre,
+            genre: Array.isArray(book.genre) ? book.genre : [book.genre],
             price: book.price,
             publish_date: book.publish_date,
             description: book.description,
@@ -55,7 +55,7 @@ const main = async () => {
                 id: book.$.id,
                 author: book.author,
                 title: book.title,
-                genre: book.genre,
+                genre: Array.isArray(book.genre) ? book.genre : [book.genre],
                 price: Number(book.price),
                 publish_date: book.publish_date,
                 description: book.description,
@@ -75,14 +75,17 @@ const main = async () => {
     await bench.run();
 
     console.log("Output:");
-    console.log("---[ fast-xml-parser ]---");
-    console.log(JSON.stringify(fxpResult));
+    const fxpResultJson = JSON.stringify(fxpResult);
+    console.log(`---[ fast-xml-parser (${fxpResultJson.length}) ]---`);
+    console.log(fxpResultJson);
     console.log();
-    console.log("---[ xml2js ]---");
-    console.log(JSON.stringify(xml2jsResult));
+    const xml2jsResultJson = JSON.stringify(xml2jsResult);
+    console.log(`---[ xml2js (${xml2jsResultJson.length}) ]---`);
+    console.log(xml2jsResultJson);
     console.log();
-    console.log("---[ typed-xml ]---");
-    console.log(JSON.stringify(txResult));
+    const txResultJson = JSON.stringify(txResult);
+    console.log(`---[ typed-xml (${txResultJson.length}) ]---`);
+    console.log(txResultJson);
     console.log();
     console.log(`Result: ${bench.name}`);
     console.table(bench.table());
