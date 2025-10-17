@@ -1,3 +1,3 @@
 # typed-xml
 
-A strongly typed XML parsing and manipulation library for TypeScript, providing type-safe XML handling capabilities
+A high-performance, schema-based XML parser for TypeScript with strong type safety.

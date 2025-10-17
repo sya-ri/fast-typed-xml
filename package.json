@@ -2,7 +2,7 @@
     "name": "typed-xml",
     "type": "module",
     "version": "0.1.0",
-    "description": "A strongly typed XML parsing and manipulation library for TypeScript, providing type-safe XML handling capabilities",
+    "description": "A high-performance, schema-based XML parser for TypeScript with strong type safety",
     "author": "sya-ri",
     "main": "dist/index.cjs",
     "module": "dist/index.js",
