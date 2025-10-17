@@ -1,6 +1,6 @@
 import { parse } from "./parser";
 
-describe("parseXML", () => {
+describe("parse", () => {
     it("parses simple element", () => {
         const xml = "<root></root>";
         expect(parse(xml)).toEqual({
@@ -175,6 +175,91 @@ describe("parseXML", () => {
                 id: "1",
             },
             text: "content",
+        });
+    });
+
+    it("parses array elements", () => {
+        const xml =
+            '<root><array id="1">1</array><array id="2">2</array><array id="3">3</array></root>';
+        expect(parse(xml)).toEqual({
+            name: "root",
+            children: [
+                {
+                    name: "array",
+                    attributes: {
+                        id: "1",
+                    },
+                    text: "1",
+                },
+                {
+                    name: "array",
+                    attributes: {
+                        id: "2",
+                    },
+                    text: "2",
+                },
+                {
+                    name: "array",
+                    attributes: {
+                        id: "3",
+                    },
+                    text: "3",
+                },
+            ],
+        });
+    });
+
+    it("parses nested array elements", () => {
+        const xml =
+            '<root><array type="first"><item id="1">1</item><item id="2">2</item></array><array type="second"><item id="3">3</item><item id="4">4</item></array></root>';
+        expect(parse(xml)).toEqual({
+            name: "root",
+            children: [
+                {
+                    name: "array",
+                    attributes: {
+                        type: "first",
+                    },
+                    children: [
+                        {
+                            name: "item",
+                            attributes: {
+                                id: "1",
+                            },
+                            text: "1",
+                        },
+                        {
+                            name: "item",
+                            attributes: {
+                                id: "2",
+                            },
+                            text: "2",
+                        },
+                    ],
+                },
+                {
+                    name: "array",
+                    attributes: {
+                        type: "second",
+                    },
+                    children: [
+                        {
+                            name: "item",
+                            attributes: {
+                                id: "3",
+                            },
+                            text: "3",
+                        },
+                        {
+                            name: "item",
+                            attributes: {
+                                id: "4",
+                            },
+                            text: "4",
+                        },
+                    ],
+                },
+            ],
         });
     });
 
