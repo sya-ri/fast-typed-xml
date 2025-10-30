@@ -123,8 +123,9 @@ const booksSchema = tx.array(
 ![](benchmark/result.png)
 
 The chart compares the throughput (operations per second) of three XML parsers.
-fast-xml-parser achieves 7,060 ops/s, and xml2js follows closely with 6,681 ops/s.
-In contrast, ts-xml reaches 40,716 ops/s, which is about **5.8× faster than fast-xml-parser and 6.1× faster than xml2js**.
+fast-xml-parser achieves 3,817 ops/s, and xml2js follows with 3,402 ops/s.
+In contrast, ts-xml reaches 28,550 ops/s (with validation) and 41,837 ops/s (parse only), which is about **7.5× faster
+than fast-xml-parser and 8.4× faster than xml2js** in parse-only mode.
 This clearly shows that ts-xml delivers far superior performance, providing high-speed XML parsing suitable for demanding real-time or large-scale applications.
 
 ## API Reference
