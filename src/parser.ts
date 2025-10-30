@@ -21,12 +21,6 @@ class XMLParser {
         return this.src.length <= this.i;
     }
 
-    private next(): string | unknown {
-        const ch = this.src[this.i];
-        this.i++;
-        return ch;
-    }
-
     private startsWith(str: string): boolean {
         const len = str.length;
         if (this.i + len > this.src.length) return false;
@@ -128,10 +122,12 @@ class XMLParser {
                 // We need to track bracket depth to find the correct closing angle bracket
                 let bracketDepth = 0;
                 while (true) {
-                    const ch = this.next();
+                    const ch = this.src[this.i];
+                    this.i++;
                     if (ch === "[") bracketDepth++;
                     else if (ch === "]" && 0 < bracketDepth) bracketDepth--;
                     else if (ch === ">" && bracketDepth === 0) break;
+                    else if (ch === undefined) this.error("Unclosed DOCTYPE");
                 }
             } else {
                 break;

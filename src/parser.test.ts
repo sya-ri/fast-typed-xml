@@ -436,17 +436,17 @@ describe("parse", () => {
             );
         });
 
-        it("throws error on unclosed root element with content", () => {
-            const xml = "<root>some text without closing tag";
-            expect(() => parse(xml)).toThrow(
-                `Unclosed element <root> at 35. Near: "<root>some text without closing tag"`,
-            );
-        });
-
         it("throws error on invalid attribute syntax", () => {
             const xml = '<root id="1" class=></root>';
             expect(() => parse(xml)).toThrow(
                 `Expected quoted attribute value at 19. Near: "<root id="1" class=></root>"`,
+            );
+        });
+
+        it("throws error on empty input", () => {
+            const xml = "";
+            expect(() => parse(xml)).toThrow(
+                `Expected element start '<' at 0. Near: ""`,
             );
         });
 
@@ -457,10 +457,45 @@ describe("parse", () => {
             );
         });
 
-        it("throws error on empty input", () => {
-            const xml = "";
+        it("throws error on unclosed root element with content", () => {
+            const xml = "<root>some text without closing tag";
             expect(() => parse(xml)).toThrow(
-                `Expected element start '<' at 0. Near: ""`,
+                `Unclosed element <root> at 35. Near: "<root>some text without closing tag"`,
+            );
+        });
+
+        it("throws error on unclosed attribute", () => {
+            const xml = '<root attr="unclosed>';
+            expect(() => parse(xml)).toThrow(
+                'Unclosed attribute value at 21. Near: "<root attr="unclosed>"',
+            );
+        });
+
+        it("throws error on unclosed DOCTYPE", () => {
+            const xml = "<!DOCTYPE html [<!ELEMENT br EMPTY<root>test</root>";
+            expect(() => parse(xml)).toThrow(
+                'Unclosed DOCTYPE at 52. Near: "ml [<!ELEMENT br EMPTY<root>test</root>"',
+            );
+        });
+
+        it("throws error on unclosed CDATA section", () => {
+            const xml = "<root><![CDATA[unclosed</root>";
+            expect(() => parse(xml)).toThrow(
+                `Expected "]]>" at 15. Near: "<root><![CDATA[unclosed</root>"`,
+            );
+        });
+
+        it("throws error on unclosed comment", () => {
+            const xml = "<root><!-- unclosed comment</root>";
+            expect(() => parse(xml)).toThrow(
+                `Expected "-->" at 6. Near: "<root><!-- unclosed comment</root>"`,
+            );
+        });
+
+        it("throws error on unclosed processing instruction", () => {
+            const xml = "<root><?test unclosed</root>";
+            expect(() => parse(xml)).toThrow(
+                `Expected "?>" at 6. Near: "<root><?test unclosed</root>"`,
             );
         });
     });
