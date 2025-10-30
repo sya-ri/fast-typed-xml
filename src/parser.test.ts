@@ -292,6 +292,50 @@ describe("parse", () => {
         });
     });
 
+    describe("skip non XML content", () => {
+        it("parses XML with processing instructions", () => {
+            const xml =
+                '<?xml version="1.0"?><?custom data?><root>content</root>';
+            expect(parse(xml)).toEqual({
+                name: "root",
+                text: "content",
+            });
+        });
+
+        it("parses XML with DOCTYPE declaration", () => {
+            const xml = "<!DOCTYPE html><root>content</root>";
+            expect(parse(xml)).toEqual({
+                name: "root",
+                text: "content",
+            });
+        });
+
+        it("parses XML with comment", () => {
+            const xml = "<!-- comment --><root><!-- comment -->content</root>";
+            expect(parse(xml)).toEqual({
+                name: "root",
+                text: "content",
+            });
+        });
+
+        it("parses XML with mixed misc content", () => {
+            const xml =
+                '<?xml version="1.0"?><!-- comment --><!DOCTYPE html><root>content</root>';
+            expect(parse(xml)).toEqual({
+                name: "root",
+                text: "content",
+            });
+        });
+
+        it("parses XML with processing instructions inside elements", () => {
+            const xml = "<root>before<?custom data?>after</root>";
+            expect(parse(xml)).toEqual({
+                name: "root",
+                text: "beforeafter",
+            });
+        });
+    });
+
     describe("error handling", () => {
         it("throws error on mismatched tags", () => {
             const xml = "<root><child></root></child>";
