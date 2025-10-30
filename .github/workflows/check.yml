@@ -20,5 +20,9 @@ jobs:
         run: npm run build
       - name: Test
         run: npm run test
+      - name: Install benchmark dependencies
+        run: npm ci
+        working-directory: ./benchmark
       - name: Run benchmark
-        run: npm run benchmark
+        run: npm run start
+        working-directory: ./benchmark
