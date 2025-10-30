@@ -1,6 +1,6 @@
 # fast-typed-xml
 
-[![npm version](https://badge.fury.io/js/fast-typed-xml.svg)](https://badge.fury.io/js/fast-typed-xml)
+[![npm version](https://badge.fury.io/js/fast-typed-xml.svg)](https://www.npmjs.com/package/fast-typed-xml)
 
 A high-performance, schema-based XML parser for TypeScript with strong type safety.
 
