@@ -393,6 +393,15 @@ describe("parse", () => {
             });
         });
 
+        it("parses XML with DOCTYPE containing internal subset", () => {
+            const xml =
+                "<!DOCTYPE root [<!ELEMENT br EMPTY>]><root>content</root>";
+            expect(parse(xml)).toEqual({
+                name: "root",
+                text: "content",
+            });
+        });
+
         it("parses XML with comment", () => {
             const xml = "<!-- comment --><root><!-- comment -->content</root>";
             expect(parse(xml)).toEqual({

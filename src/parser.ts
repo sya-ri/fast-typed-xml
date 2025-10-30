@@ -115,36 +115,24 @@ class XMLParser {
         return val;
     }
 
-    private readComment() {
-        this.expect("<!--");
-        this.readUntil("-->");
-    }
-
-    private readPI() {
-        this.expect("<?");
-        this.readUntil("?>");
-    }
-
-    private readDOCTYPE() {
-        this.expect("<!DOCTYPE");
-        let bracketDepth = 0;
-        while (true) {
-            const ch = this.next();
-            if (ch === "[") bracketDepth++;
-            else if (ch === "]" && 0 < bracketDepth) bracketDepth--;
-            else if (ch === ">" && bracketDepth === 0) break;
-        }
-    }
-
     private skipMisc() {
         this.skipWS();
         while (!this.eof()) {
             if (this.startsWith("<!--")) {
-                this.readComment();
+                this.readUntil("-->");
             } else if (this.startsWith("<?")) {
-                this.readPI();
+                this.readUntil("?>");
             } else if (this.startsWith("<!DOCTYPE")) {
-                this.readDOCTYPE();
+                // DOCTYPE declarations can contain nested brackets for DTD internal subset
+                // Example: <!DOCTYPE root [<!ELEMENT br EMPTY>]>
+                // We need to track bracket depth to find the correct closing angle bracket
+                let bracketDepth = 0;
+                while (true) {
+                    const ch = this.next();
+                    if (ch === "[") bracketDepth++;
+                    else if (ch === "]" && 0 < bracketDepth) bracketDepth--;
+                    else if (ch === ">" && bracketDepth === 0) break;
+                }
             } else {
                 break;
             }
@@ -206,7 +194,7 @@ class XMLParser {
                 break;
             }
             if (this.startsWith("<!--")) {
-                this.readComment();
+                this.readUntil("-->");
                 continue;
             }
             if (this.startsWith("<![CDATA[")) {
@@ -215,7 +203,7 @@ class XMLParser {
                 continue;
             }
             if (this.startsWith("<?")) {
-                this.readPI();
+                this.readUntil("?>");
                 continue;
             }
 
