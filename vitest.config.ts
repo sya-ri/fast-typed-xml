@@ -4,5 +4,9 @@ export default defineConfig({
     test: {
         watch: false,
         globals: true,
+        include: ["src/**/*.test.ts"],
+        coverage: {
+            include: ["src/**/*.ts"],
+        },
     },
 });
