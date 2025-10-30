@@ -1,16 +1,7 @@
-import { faker } from "@faker-js/faker";
 import { describe, expect, it } from "vitest";
 import type { Infer } from "./index";
 import * as tx from "./index";
-import {
-    type ArraySchema,
-    AttributeSchema,
-    booleanValueSchema,
-    type ElementSchema,
-    numberValueSchema,
-    type ObjectSchema,
-    stringValueSchema,
-} from "./schema";
+import type { ArraySchema, ElementSchema, ObjectSchema } from "./schema";
 
 describe("Infer", () => {
     it("should infer required and optional primitive types correctly", () => {

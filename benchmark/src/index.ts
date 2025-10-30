@@ -1,8 +1,8 @@
 import * as fs from "node:fs";
-import { XMLParser } from "fast-xml-parser";
-import { Bench } from "tinybench";
 import * as tx from "fast-typed-xml";
 import * as txParser from "fast-typed-xml/parser";
+import { XMLParser } from "fast-xml-parser";
+import { Bench } from "tinybench";
 import { parseStringPromise } from "xml2js";
 
 const xml = fs.readFileSync("example.xml", "utf-8");
