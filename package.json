@@ -1,5 +1,5 @@
 {
-    "name": "typed-xml",
+    "name": "ts-xml",
     "type": "module",
     "version": "0.1.0",
     "description": "A high-performance, schema-based XML parser for TypeScript with strong type safety",

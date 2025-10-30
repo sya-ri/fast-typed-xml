@@ -1,8 +1,8 @@
 import * as fs from "node:fs";
 import { XMLParser } from "fast-xml-parser";
 import { Bench } from "tinybench";
-import * as tx from "typed-xml";
-import * as txParser from "typed-xml/parser";
+import * as tx from "ts-xml";
+import * as txParser from "ts-xml/parser";
 import { parseStringPromise } from "xml2js";
 
 const xml = fs.readFileSync("example.xml", "utf-8");
@@ -12,7 +12,7 @@ const parser = new XMLParser({
     ignoreAttributes: false,
 });
 
-// typed-xml
+// ts-xml
 const schema = tx.array(
     tx.object({
         id: tx.string("id", "attribute"),
@@ -63,12 +63,12 @@ const main = async () => {
         );
     });
 
-    bench.add("typed-xml (parse only)", async () => {
+    bench.add("ts-xml (parse only)", async () => {
         txParser.parse(xml);
     });
 
     let txResult: unknown;
-    bench.add("typed-xml", async () => {
+    bench.add("ts-xml", async () => {
         txResult = schema.parse(xml);
     });
 
@@ -84,7 +84,7 @@ const main = async () => {
     console.log(xml2jsResultJson);
     console.log();
     const txResultJson = JSON.stringify(txResult);
-    console.log(`---[ typed-xml (${txResultJson.length}) ]---`);
+    console.log(`---[ ts-xml (${txResultJson.length}) ]---`);
     console.log(txResultJson);
     console.log();
     console.log(`Result: ${bench.name}`);
