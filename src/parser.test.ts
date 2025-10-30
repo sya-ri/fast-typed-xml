@@ -19,6 +19,23 @@ describe("parse", () => {
         });
     });
 
+    it("parses element names starting with letters and underscore", () => {
+        expect(parse("<abc></abc>")).toEqual({ name: "abc" });
+        expect(parse("<ABC></ABC>")).toEqual({ name: "ABC" });
+        expect(parse("<_test></_test>")).toEqual({ name: "_test" });
+    });
+
+    it("parses element names containing numbers, dots and hyphens", () => {
+        expect(parse("<test123></test123>")).toEqual({ name: "test123" });
+        expect(parse("<my.tag></my.tag>")).toEqual({ name: "my.tag" });
+        expect(parse("<data-item></data-item>")).toEqual({ name: "data-item" });
+    });
+
+    it("throws error on invalid element names", () => {
+        expect(() => parse("<1abc></1abc>")).toThrow("Invalid name start");
+        expect(() => parse("<123></123>")).toThrow("Invalid name start");
+    });
+
     it("parses element with text content", () => {
         const xml = "<root>Hello</root>";
         expect(parse(xml)).toEqual({
