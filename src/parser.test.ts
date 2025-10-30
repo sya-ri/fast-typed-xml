@@ -427,6 +427,13 @@ describe("parse", () => {
             );
         });
 
+        it("throws error on unclosed root element with content", () => {
+            const xml = "<root>some text without closing tag";
+            expect(() => parse(xml)).toThrow(
+                `Unclosed element <root> at 35. Near: "<root>some text without closing tag"`,
+            );
+        });
+
         it("throws error on invalid attribute syntax", () => {
             const xml = '<root id="1" class=></root>';
             expect(() => parse(xml)).toThrow(
