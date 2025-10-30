@@ -1,6 +1,7 @@
 {
     "name": "ts-xml",
-    "type": "module",
+    "version": "0.1.0",
+    "description": "A high-performance, schema-based XML parser for TypeScript with strong type safety",
     "keywords": [
         "typescript",
         "xml",
@@ -13,12 +14,8 @@
         "zero-dependencies",
         "node"
     ],
-    "version": "0.1.0",
-    "description": "A high-performance, schema-based XML parser for TypeScript with strong type safety",
     "author": "sya-ri",
-    "main": "dist/index.cjs",
-    "module": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
@@ -41,16 +38,19 @@
             "require": "./dist/util.cjs"
         }
     },
+    "main": "dist/index.cjs",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
     "scripts": {
         "build": "tsdown",
-        "test": "vitest",
-        "test:coverage": "vitest --coverage",
         "check": "run-p check:*",
         "check:biome": "biome check .",
         "check:package-json": "sort-package-json --check",
         "fix": "run-p fix:*",
         "fix:biome": "biome check --write .",
-        "fix:package-json": "sort-package-json"
+        "fix:package-json": "sort-package-json",
+        "test": "vitest",
+        "test:coverage": "vitest --coverage"
     },
     "devDependencies": {
         "@biomejs/biome": "2.2.5",

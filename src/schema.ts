@@ -1,5 +1,4 @@
 import { InvalidInputError } from "./error";
-import { boolean } from "./index";
 import { type NodeLike, parse } from "./parser";
 import { getChild, parseBooleanOrFail, parseNumberOrFail } from "./util";
 
