@@ -443,6 +443,13 @@ describe("parse", () => {
             );
         });
 
+        it("throws error on empty attribute value", () => {
+            const xml = "<root attr></root>";
+            expect(() => parse(xml)).toThrow(
+                'Expected "=" at 10. Near: "<root attr></root>"',
+            );
+        });
+
         it("throws error on empty input", () => {
             const xml = "";
             expect(() => parse(xml)).toThrow(
@@ -496,6 +503,13 @@ describe("parse", () => {
             const xml = "<root><?test unclosed</root>";
             expect(() => parse(xml)).toThrow(
                 `Expected "?>" at 6. Near: "<root><?test unclosed</root>"`,
+            );
+        });
+
+        it("throws error on malformed self-closing tag", () => {
+            const xml = "<root><root/";
+            expect(() => parse(xml)).toThrow(
+                'Expected ">" at 11. Near: "<root><root/"',
             );
         });
     });
