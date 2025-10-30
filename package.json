@@ -1,6 +1,18 @@
 {
     "name": "ts-xml",
     "type": "module",
+    "keywords": [
+        "typescript",
+        "xml",
+        "xml-parser",
+        "schema",
+        "validation",
+        "type-safe",
+        "high-performance",
+        "fast",
+        "zero-dependencies",
+        "node"
+    ],
     "version": "0.1.0",
     "description": "A high-performance, schema-based XML parser for TypeScript with strong type safety",
     "author": "sya-ri",
