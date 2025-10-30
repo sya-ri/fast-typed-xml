@@ -139,7 +139,7 @@ export class ArraySchema<
 {
     constructor(
         private readonly name: IsElement extends true ? string : undefined,
-        private readonly schema: Schema<T, boolean>,
+        private readonly schema: Schema<T, false>,
         private readonly optional: Optional,
     ) {}
 
@@ -159,14 +159,7 @@ export class ArraySchema<
             }
         }
 
-        const arr: T[] = [];
-        for (const child of children) {
-            const value = this.schema.decode(child);
-            if (value !== undefined) {
-                arr.push(value);
-            }
-        }
-        return arr;
+        return children.map((child) => this.schema.decode(child));
     }
 
     parse(xml: string): ReturnType<typeof this.decode> {
