@@ -1,6 +1,6 @@
-# ts-xml
+# fast-typed-xml
 
-[![npm version](https://badge.fury.io/js/ts-xml.svg)](https://badge.fury.io/js/ts-xml)
+[![npm version](https://badge.fury.io/js/fast-typed-xml.svg)](https://badge.fury.io/js/fast-typed-xml)
 
 A high-performance, schema-based XML parser for TypeScript with strong type safety.
 
@@ -15,12 +15,12 @@ A high-performance, schema-based XML parser for TypeScript with strong type safe
 ## Installation
 
 ```bash
-npm install ts-xml
+npm install fast-typed-xml
 ```
 
 ## Quick Start
 ```typescript
-import * as tx from "ts-xml";
+import * as tx from "fast-typed-xml";
 
 // Define your schema
 const bookSchema = tx.object({
@@ -124,18 +124,18 @@ const booksSchema = tx.array(
 
 The chart compares the throughput (operations per second) of three XML parsers.
 fast-xml-parser achieves 3,817 ops/s, and xml2js follows with 3,402 ops/s.
-In contrast, ts-xml reaches 28,550 ops/s (with validation) and 41,837 ops/s (parse only), which is about **7.5× faster
+In contrast, fast-typed-xml reaches 28,550 ops/s (with validation) and 41,837 ops/s (parse only), which is about **7.5× faster
 than fast-xml-parser and 8.4× faster than xml2js** in parse-only mode.
-This clearly shows that ts-xml delivers far superior performance, providing high-speed XML parsing suitable for demanding real-time or large-scale applications.
+This clearly shows that fast-typed-xml delivers far superior performance, providing high-speed XML parsing suitable for demanding real-time or large-scale applications.
 
 ## API Reference
 
 ### Exports
 
-- `ts-xml` - Main schema API
-- `ts-xml/parser` - Low-level XML parser
-- `ts-xml/schema` - Schema types and utilities
-- `ts-xml/util` - Utility functions
+- `fast-typed-xml` - Main schema API
+- `fast-typed-xml/parser` - Low-level XML parser
+- `fast-typed-xml/schema` - Schema types and utilities
+- `fast-typed-xml/util` - Utility functions
 
 ## Contributing
 
