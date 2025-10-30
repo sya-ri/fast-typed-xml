@@ -48,6 +48,50 @@ describe("parse", () => {
                 text: "content",
             });
         });
+
+        it("parses XML with excessive whitespace", () => {
+            const xml = `<root    id="1"   ><child   type="test"  >    content   </child  ></root >`;
+            expect(parse(xml)).toEqual({
+                name: "root",
+                attributes: {
+                    id: "1",
+                },
+                children: [
+                    {
+                        name: "child",
+                        attributes: {
+                            type: "test",
+                        },
+                        text: "    content   ", // whitespace is preserved
+                    },
+                ],
+            });
+        });
+
+        it("parses XML with missing whitespace", () => {
+            const xml =
+                '<root><child type="a"id="1">text</child><child type="b"id="2"/></root>';
+            expect(parse(xml)).toEqual({
+                name: "root",
+                children: [
+                    {
+                        name: "child",
+                        attributes: {
+                            type: "a",
+                            id: "1",
+                        },
+                        text: "text",
+                    },
+                    {
+                        name: "child",
+                        attributes: {
+                            type: "b",
+                            id: "2",
+                        },
+                    },
+                ],
+            });
+        });
     });
 
     describe("element name validation", () => {
