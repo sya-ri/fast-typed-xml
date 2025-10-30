@@ -52,6 +52,14 @@ describe.each([
 });
 
 describe("tx.string", () => {
+    it("should use string() without arguments as ValueSchema", () => {
+        const schema = tx.array(tx.string());
+        const actual = schema.parse(
+            "<root><item>a</item><item>b</item></root>",
+        );
+        expect(actual).toEqual(["a", "b"]);
+    });
+
     it("should parse string from an attribute", () => {
         const schema = tx.string("NAME", "attribute");
         const actual = schema.parse("<root NAME='test'/>");
@@ -106,6 +114,14 @@ describe("tx.string", () => {
 });
 
 describe("tx.number", () => {
+    it("should use number() without arguments as ValueSchema", () => {
+        const schema = tx.array(tx.number());
+        const actual = schema.parse(
+            "<root><item>1</item><item>2</item></root>",
+        );
+        expect(actual).toEqual([1, 2]);
+    });
+
     it("should parse positive integer from an element", () => {
         const schema = tx.number("NUM", "element");
         const actual = schema.parse("<root><NUM>123</NUM></root>");
@@ -178,6 +194,14 @@ describe("tx.number", () => {
 });
 
 describe("tx.boolean", () => {
+    it("should use boolean() without arguments as ValueSchema", () => {
+        const schema = tx.array(tx.boolean());
+        const actual = schema.parse(
+            "<root><item>true</item><item>false</item></root>",
+        );
+        expect(actual).toEqual([true, false]);
+    });
+
     it("should parse true from an element", () => {
         const schema = tx.boolean("FLAG", "element");
         const actual = schema.parse("<root><FLAG>true</FLAG></root>");
@@ -320,34 +344,6 @@ describe("tx.object", () => {
         const schema = tx.object({
             id: tx.string("ID", "attribute"),
             metadata: tx.object("METADATA", {
-                tags: tx.object("TAGS", {
-                    tag: tx.array("TAG", tx.string()),
-                }),
-                properties: tx.object("PROPERTIES", {
-                    enabled: tx.boolean("ENABLED", "element"),
-                }),
-            }),
-        });
-        const actual = schema.parse(
-            "<root ID='xyz'><METADATA><TAGS><TAG>foo</TAG><TAG>bar</TAG></TAGS><PROPERTIES><ENABLED>true</ENABLED></PROPERTIES></METADATA></root>",
-        );
-        expect(actual).toEqual({
-            id: "xyz",
-            metadata: {
-                tags: {
-                    tag: ["foo", "bar"],
-                },
-                properties: {
-                    enabled: true,
-                },
-            },
-        });
-    });
-
-    it("should parse an object with multiple nested levels and arrays", () => {
-        const schema = tx.object({
-            id: tx.string("ID", "attribute"),
-            metadata: tx.object("METADATA", {
                 tags: tx.array("TAG", tx.string()),
                 properties: tx.object("PROPERTIES", {
                     enabled: tx.boolean("ENABLED", "element"),
@@ -396,6 +392,96 @@ describe("tx.object", () => {
         });
     });
 
+    it("should parse object containing array without wrapper", () => {
+        const schema = tx.object({
+            id: tx.string("ID", "attribute"),
+            tags: tx.array("TAG", tx.string()),
+        });
+        const actual = schema.parse(
+            "<root ID='123'><TAG>a</TAG><TAG>b</TAG></root>",
+        );
+        expect(actual).toEqual({
+            id: "123",
+            tags: ["a", "b"],
+        });
+    });
+
+    it("should parse object with optional array", () => {
+        const schema = tx.object({
+            id: tx.string("ID", "attribute"),
+            tags: tx.array("TAG", tx.string(), true),
+        });
+        const actual = schema.parse("<root ID='123'></root>");
+        expect(actual).toEqual({
+            id: "123",
+            tags: undefined,
+        });
+    });
+
+    it("should parse optional object when present", () => {
+        const schema = tx.object({
+            id: tx.string("ID", "attribute"),
+            details: tx.object(
+                "DETAILS",
+                {
+                    name: tx.string("NAME", "element"),
+                },
+                true,
+            ),
+        });
+        const actual = schema.parse(
+            "<root ID='123'><DETAILS><NAME>Test</NAME></DETAILS></root>",
+        );
+        expect(actual).toEqual({
+            id: "123",
+            details: { name: "Test" },
+        });
+    });
+
+    it("should parse optional object when missing", () => {
+        const schema = tx.object({
+            id: tx.string("ID", "attribute"),
+            details: tx.object(
+                "DETAILS",
+                {
+                    name: tx.string("NAME", "element"),
+                },
+                true,
+            ),
+        });
+        const actual = schema.parse("<root ID='123'></root>");
+        expect(actual).toEqual({
+            id: "123",
+            details: undefined,
+        });
+    });
+
+    it("should throw error for required named object when missing", () => {
+        const schema = tx.object({
+            id: tx.string("ID", "attribute"),
+            details: tx.object("DETAILS", {
+                name: tx.string("NAME", "element"),
+            }),
+        });
+        expect(() => schema.parse("<root ID='123'></root>")).toThrow();
+    });
+
+    it("should parse empty object schema", () => {
+        const schema = tx.object({});
+        const actual = schema.parse("<root></root>");
+        expect(actual).toEqual({});
+    });
+
+    it("should parse named empty object schema", () => {
+        const schema = tx.object({
+            empty: tx.object("EMPTY", {}),
+        });
+        const actual = schema.parse("<root><EMPTY/></root>");
+        expect(actual).toEqual({
+            empty: {},
+        });
+    });
+
     it("should throw an error when the required field is missing", () => {
         const schema = tx.object({
             id: tx.string("ID", "attribute"),
@@ -415,6 +501,50 @@ describe("tx.object", () => {
 });
 
 describe("tx.array", () => {
+    it("should parse array with specific element name", () => {
+        const stringSchema = tx.array("ITEM", tx.string());
+        const numberSchema = tx.array("NUM", tx.number());
+
+        expect(
+            stringSchema.parse("<root><ITEM>a</ITEM><ITEM>b</ITEM></root>"),
+        ).toEqual(["a", "b"]);
+        expect(
+            numberSchema.parse("<root><NUM>1</NUM><NUM>2</NUM></root>"),
+        ).toEqual([1, 2]);
+    });
+
+    it("should parse array with specific element name for objects", () => {
+        const schema = tx.array(
+            "USER",
+            tx.object({
+                name: tx.string("NAME", "element"),
+            }),
+        );
+        const actual = schema.parse(
+            "<root><USER><NAME>Alice</NAME></USER><USER><NAME>Bob</NAME></USER></root>",
+        );
+        expect(actual).toEqual([{ name: "Alice" }, { name: "Bob" }]);
+    });
+
+    it("should parse optional named array when empty", () => {
+        const schema = tx.array("ITEM", tx.string(), true);
+        const actual = schema.parse("<root></root>");
+        expect(actual).toBeUndefined();
+    });
+
+    it("should throw error for required named array when empty", () => {
+        const schema = tx.array("ITEM", tx.string());
+        expect(() => schema.parse("<root></root>")).toThrow();
+    });
+
+    it("should parse named nested arrays", () => {
+        const schema = tx.array("GROUP", tx.array(tx.string()));
+        const actual = schema.parse(
+            "<root><GROUP><ITEM>a</ITEM><ITEM>b</ITEM></GROUP><GROUP><ITEM>c</ITEM></GROUP></root>",
+        );
+        expect(actual).toEqual([["a", "b"], ["c"]]);
+    });
+
     it("should parse an array of objects", () => {
         const schema = tx.array(
             tx.object({
