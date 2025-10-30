@@ -292,6 +292,45 @@ describe("parse", () => {
         });
     });
 
+    describe("cdata parsing", () => {
+        it("parses basic CDATA content", () => {
+            const xml = "<root><![CDATA[text content]]></root>";
+            expect(parse(xml)).toEqual({
+                name: "root",
+                text: "text content",
+            });
+        });
+
+        it("preserves special characters in CDATA", () => {
+            const xml = '<root><![CDATA[<test> & > < "quoted"]]></root>';
+            expect(parse(xml)).toEqual({
+                name: "root",
+                text: '<test> & > < "quoted"',
+            });
+        });
+
+        it("parses multiple CDATA sections", () => {
+            const xml = "<root><![CDATA[first]]><![CDATA[second]]></root>";
+            expect(parse(xml)).toEqual({
+                name: "root",
+                text: "firstsecond",
+            });
+        });
+
+        it("parses mixed content with CDATA", () => {
+            const xml = "<root>before<![CDATA[cdata]]>after<child/>end</root>";
+            expect(parse(xml)).toEqual({
+                name: "root",
+                text: "beforecdataafterend",
+                children: [
+                    {
+                        name: "child",
+                    },
+                ],
+            });
+        });
+    });
+
     describe("skip non XML content", () => {
         it("parses XML with processing instructions", () => {
             const xml =
