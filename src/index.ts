@@ -345,21 +345,6 @@ export function array<const T>(
 ): ArraySchema<T, false, false>;
 
 export function array<const T>(
-    schema: ArraySchema<T, false, false>,
-    optional: false,
-): ArraySchema<T, false, false>;
-
-export function array<const T>(
-    schema: ArraySchema<T, false, false>,
-    optional: true,
-): ArraySchema<T, false, true>;
-
-export function array<const T, const Optional extends boolean>(
-    schema: ArraySchema<T, false, Optional>,
-    optional: Optional,
-): ArraySchema<T, false, Optional>;
-
-export function array<const T>(
     name: string,
     schema: ArraySchema<T, false, false> | ValueSchema<T>,
 ): ArraySchema<T, true, false>;
@@ -383,7 +368,7 @@ export function array<const T>(
 
 export function array<const T, const Optional extends boolean>(
     name: string,
-    schema: ArraySchema<T, false, Optional> | ValueSchema<T>,
+    schema: ArraySchema<T, false, false> | ValueSchema<T>,
     optional: Optional,
 ): ArraySchema<T, true, Optional>;
 
@@ -416,10 +401,10 @@ export function array<
     nameOrSchema:
         | string
         | ValueSchema<T>
-        | ArraySchema<T, false, Optional>
+        | ArraySchema<T, false, false>
         | ObjectSchema<T, S>,
     schemaOrOptional?:
-        | ArraySchema<T, false, Optional>
+        | ArraySchema<T, false, false>
         | ValueSchema<T>
         | ObjectSchema<T, S>
         | Optional,
