@@ -46,7 +46,7 @@ console.log(result.title); // "The Great Gatsby"
 
 ## Benchmarks
 
-![](benchmark/result.png)
+![](https://github.com/sya-ri/fast-typed-xml/blob/master/benchmark/result.png?raw=true)
 
 The chart compares the throughput (operations per second) of three XML parsers.
 fast-xml-parser achieves 3,817 ops/s, and xml2js follows with 3,402 ops/s.
