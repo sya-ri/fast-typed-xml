@@ -44,6 +44,25 @@ const result = bookSchema.parse(xml);
 console.log(result.title); // "The Great Gatsby"
 ```
 
+## Benchmarks
+
+![](benchmark/result.png)
+
+The chart compares the throughput (operations per second) of three XML parsers.
+fast-xml-parser achieves 3,817 ops/s, and xml2js follows with 3,402 ops/s.
+In contrast, fast-typed-xml reaches 28,550 ops/s (with validation) and 41,837 ops/s (parse only), which is about **7.5× faster
+than fast-xml-parser and 8.4× faster than xml2js** in parse-only mode.
+This clearly shows that fast-typed-xml delivers far superior performance, providing high-speed XML parsing suitable for demanding real-time or large-scale applications.
+
+## API Reference
+
+### Exports
+
+- `fast-typed-xml` - Main schema API
+- `fast-typed-xml/parser` - Low-level XML parser
+- `fast-typed-xml/schema` - Schema types and utilities
+- `fast-typed-xml/util` - Utility functions
+
 ## Schema API
 
 ### Basic Types
@@ -118,24 +137,130 @@ const booksSchema = tx.array(
 // Parses: <books><book><title>The Great Gatsby</title></books>
 ```
 
-## Benchmarks
+### Custom Types
 
-![](benchmark/result.png)
+> [!TIP]
+> 
+> fast-typed-xml is a library focused on type-safe XML parsing. For more robust validation, it is safer and more efficient to use dedicated validation libraries like [zod](https://github.com/colinhacks/zod), [arktype](https://github.com/arktypeio/arktype), or [valibot](https://github.com/fabian-hiller/valibot) on the parsed results.
 
-The chart compares the throughput (operations per second) of three XML parsers.
-fast-xml-parser achieves 3,817 ops/s, and xml2js follows with 3,402 ops/s.
-In contrast, fast-typed-xml reaches 28,550 ops/s (with validation) and 41,837 ops/s (parse only), which is about **7.5× faster
-than fast-xml-parser and 8.4× faster than xml2js** in parse-only mode.
-This clearly shows that fast-typed-xml delivers far superior performance, providing high-speed XML parsing suitable for demanding real-time or large-scale applications.
+You can define custom types with validation by extending the schema API. Here's an example of creating a custom `userState` type:
 
-## API Reference
+```typescript
+import * as tx from "fast-typed-xml";
+import { AttributeSchema, ElementSchema, ValueSchema } from "fast-typed-xml/schema";
 
-### Exports
+// 1. Define your custom type
+type UserState = "active" | "inactive";
 
-- `fast-typed-xml` - Main schema API
-- `fast-typed-xml/parser` - Low-level XML parser
-- `fast-typed-xml/schema` - Schema types and utilities
-- `fast-typed-xml/util` - Utility functions
+
+// 2. Create a parser function
+const parseUserState = (v: string): UserState => {
+    switch (v) {
+        case "active":
+        case "inactive":
+            return v;
+        default:
+            throw new Error(`Invalid user state: ${v}`);
+    }
+};
+
+
+// 3. Define schema factories
+const userStateAttributeSchema = <Optional extends boolean>(
+    name: string,
+    optional: Optional,
+) => new AttributeSchema<UserState, Optional>(name, optional, parseUserState);
+
+const userStateValueSchema = new ValueSchema<UserState>(parseUserState);
+
+
+// 4. Create overloaded function with flexible signatures
+function userState(): ValueSchema<UserState>;
+
+function userState(
+    name: string,
+    kind: "attribute",
+): AttributeSchema<UserState, false>;
+
+function userState(
+    name: string,
+    kind: "attribute",
+    optional: false,
+): AttributeSchema<UserState, false>;
+
+function userState(
+    name: string,
+    kind: "attribute",
+    optional: true,
+): AttributeSchema<UserState, true>;
+
+function userState<Optional extends boolean>(
+    name: string,
+    kind: "attribute",
+    optional: Optional,
+): AttributeSchema<UserState, Optional>;
+
+function userState(
+    name: string,
+    kind: "element",
+): ElementSchema<UserState, false>;
+
+function userState(
+    name: string,
+    kind: "element",
+    optional: false,
+): ElementSchema<UserState, false>;
+
+function userState(
+    name: string,
+    kind: "element",
+    optional: true,
+): ElementSchema<UserState, true>;
+
+function userState<Optional extends boolean>(
+    name: string,
+    kind: "element",
+    optional: Optional,
+): ElementSchema<UserState, Optional>;
+
+function userState<Optional extends boolean>(
+    name?: string,
+    kind?: "attribute" | "element",
+    optional?: Optional,
+):
+    | AttributeSchema<UserState, Optional>
+    | ValueSchema<UserState>
+    | ElementSchema<UserState, Optional> {
+    if (name !== undefined) {
+        switch (kind) {
+            case "attribute": {
+                return userStateAttributeSchema(name, optional as Optional);
+            }
+            case "element": {
+                return new ElementSchema(
+                    name,
+                    userStateValueSchema,
+                    optional as Optional,
+                );
+            }
+        }
+    }
+    return userStateValueSchema;
+}
+
+
+// 5. Use your custom type in schemas
+const schema = tx.object({
+    state: userState("state", "element")
+});
+const result = schema.parse("<user><state>active</state></user>"); // result: { state: "active" }
+```
+
+This approach gives you:
+- **Type Safety**: The return type is correctly inferred based on the parameters
+- **Validation**: Custom parsing logic with error handling
+- **Flexibility**: Can be used as an element, attribute, or standalone value
+- **Consistency**: Same API pattern as built-in types like `tx.string()` and `tx.number()`
 
 ## Contributing
 
