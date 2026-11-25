@@ -1,28 +1,41 @@
 name: CI
 on:
-  push:
-    branches: [ master ]
-  pull_request:
+    push:
+        branches: [master]
+    pull_request:
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: 'package.json'
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm ci
-      - name: Check
-        run: npm run check
-      - name: Build
-        run: npm run build
-      - name: Test
-        run: npm run test
-      - name: Install benchmark dependencies
-        run: npm ci
-        working-directory: ./benchmark
-      - name: Run benchmark
-        run: npm run start
-        working-directory: ./benchmark
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node: [24, 26]
+        steps:
+            - uses: actions/checkout@v7.0.1
+            - uses: actions/setup-node@v7.1.0
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: "npm"
+            - name: Install dependencies
+              run: npm ci
+            - name: Check
+              run: npm run check
+            - name: Build
+              run: npm run build
+            - name: Check package exports
+              run: |
+                  node --input-type=module <<'JS'
+                  import { createRequire } from "node:module";
+                  const require = createRequire(import.meta.url);
+                  for (const name of ["fast-typed-xml", "fast-typed-xml/parser", "fast-typed-xml/schema", "fast-typed-xml/util"]) {
+                    await import(name);
+                    require(name);
+                  }
+                  JS
+            - name: Test
+              run: npm run test
+            - name: Install benchmark dependencies
+              run: npm ci
+              working-directory: ./benchmark
+            - name: Run benchmark
+              run: npm run start
+              working-directory: ./benchmark

@@ -2,6 +2,20 @@ import { parse } from "./parser";
 
 describe("parse", () => {
     describe("basic element parsing", () => {
+        it("preserves qualified names in XML with a byte order mark", () => {
+            const xml =
+                '\uFEFF<?xml version="1.0"?><p:project xmlns:p="urn:p" xmlns:xsi="urn:xsi" xsi:type="p:Project"><p:version>1.2</p:version></p:project>';
+            expect(parse(xml)).toEqual({
+                name: "p:project",
+                attributes: {
+                    "xmlns:p": "urn:p",
+                    "xmlns:xsi": "urn:xsi",
+                    "xsi:type": "p:Project",
+                },
+                children: [{ name: "p:version", text: "1.2" }],
+            });
+        });
+
         it("parses simple element", () => {
             const xml = "<root></root>";
             expect(parse(xml)).toEqual({

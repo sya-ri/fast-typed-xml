@@ -19,14 +19,15 @@ npm install fast-typed-xml
 ```
 
 ## Quick Start
+
 ```typescript
 import * as tx from "fast-typed-xml";
 
 // Define your schema
 const bookSchema = tx.object({
-    id: tx.string("id", "attribute"), 
-    title: tx.string("title", "element"), 
-    author: tx.string("author", "element"), 
+    id: tx.string("id", "attribute"),
+    title: tx.string("title", "element"),
+    author: tx.string("author", "element"),
     price: tx.number("price", "element"),
 });
 
@@ -68,47 +69,51 @@ This clearly shows that fast-typed-xml delivers far superior performance, provid
 ### Basic Types
 
 #### `string(name, type, optional?)`
+
 Parse XML element or attribute as a string.
 
 ```typescript
 // Element: <title>Book Title</title>
-tx.string("title", "element")
+tx.string("title", "element");
 
 // Attribute: <book id="123">
-tx.string("id", "attribute")
+tx.string("id", "attribute");
 ```
 
 #### `number(name, type, optional?)`
+
 Parse XML element or attribute as a number.
 
 ```typescript
 // Element: <price>19.99</price>
-tx.number("price", "element")
+tx.number("price", "element");
 
 // Attribute: <item count="5">
-tx.number("count", "attribute")
+tx.number("count", "attribute");
 ```
 
 #### `boolean(name, type, optional?)`
+
 Parse XML element or attribute as a boolean.
 
 ```typescript
 // Element: <available>true</available>
-tx.boolean("available", "element")
+tx.boolean("available", "element");
 
 // Attribute: <item inStock="false">
-tx.boolean("inStock", "attribute")
+tx.boolean("inStock", "attribute");
 ```
 
 ### Complex Types
 
 #### `object(name?, schema, optional?)`
+
 Parse XML element with nested structure.
 
 ```typescript
 const personSchema = tx.object({
-    name: tx.string("name", "element"), 
-    age: tx.number("age", "element"), 
+    name: tx.string("name", "element"),
+    age: tx.number("age", "element"),
     email: tx.string("email", "element"),
 });
 
@@ -121,6 +126,7 @@ const personSchema = tx.object({
 ```
 
 #### `array(name?, schema, optional?)`
+
 Parse multiple XML elements as an array.
 
 ```typescript
@@ -132,7 +138,7 @@ const genresSchema = tx.array("genre", tx.string());
 const booksSchema = tx.array(
     tx.object({
         title: tx.string("title", "element"),
-    })
+    }),
 );
 // Parses: <books><book><title>The Great Gatsby</title></books>
 ```
@@ -140,18 +146,21 @@ const booksSchema = tx.array(
 ### Custom Types
 
 > [!TIP]
-> 
+>
 > fast-typed-xml is a library focused on type-safe XML parsing. For more robust validation, it is safer and more efficient to use dedicated validation libraries like [zod](https://github.com/colinhacks/zod), [arktype](https://github.com/arktypeio/arktype), or [valibot](https://github.com/fabian-hiller/valibot) on the parsed results.
 
 You can define custom types with validation by extending the schema API. Here's an example of creating a custom `userState` type:
 
 ```typescript
 import * as tx from "fast-typed-xml";
-import { AttributeSchema, ElementSchema, ValueSchema } from "fast-typed-xml/schema";
+import {
+    AttributeSchema,
+    ElementSchema,
+    ValueSchema,
+} from "fast-typed-xml/schema";
 
 // 1. Define your custom type
 type UserState = "active" | "inactive";
-
 
 // 2. Create a parser function
 const parseUserState = (v: string): UserState => {
@@ -164,7 +173,6 @@ const parseUserState = (v: string): UserState => {
     }
 };
 
-
 // 3. Define schema factories
 const userStateAttributeSchema = <Optional extends boolean>(
     name: string,
@@ -172,7 +180,6 @@ const userStateAttributeSchema = <Optional extends boolean>(
 ) => new AttributeSchema<UserState, Optional>(name, optional, parseUserState);
 
 const userStateValueSchema = new ValueSchema<UserState>(parseUserState);
-
 
 // 4. Create overloaded function with flexible signatures
 function userState(): ValueSchema<UserState>;
@@ -248,15 +255,15 @@ function userState<Optional extends boolean>(
     return userStateValueSchema;
 }
 
-
 // 5. Use your custom type in schemas
 const schema = tx.object({
-    state: userState("state", "element")
+    state: userState("state", "element"),
 });
 const result = schema.parse("<user><state>active</state></user>"); // result: { state: "active" }
 ```
 
 This approach gives you:
+
 - **Type Safety**: The return type is correctly inferred based on the parameters
 - **Validation**: Custom parsing logic with error handling
 - **Flexibility**: Can be used as an element, attribute, or standalone value
