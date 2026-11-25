@@ -1,6 +1,6 @@
 {
     "name": "fast-typed-xml",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "A high-performance, schema-based XML parser for TypeScript with strong type safety",
     "keywords": [
         "typescript",
@@ -14,6 +14,10 @@
         "zero-dependencies",
         "node"
     ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sya-ri/fast-typed-xml.git"
+    },
     "author": "sya-ri",
     "type": "module",
     "exports": {
@@ -56,16 +60,17 @@
         "test:coverage": "vitest --coverage"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.3.2",
-        "@faker-js/faker": "10.1.0",
-        "@vitest/coverage-v8": "4.0.5",
-        "npm-run-all2": "8.0.4",
-        "sort-package-json": "3.4.0",
-        "tsdown": "0.15.12",
-        "typescript": "5.9.3",
-        "vitest": "4.0.5"
+        "@biomejs/biome": "2.6.9",
+        "@faker-js/faker": "10.6.0",
+        "@types/node": "26.6.7",
+        "@vitest/coverage-v8": "5.1.1",
+        "npm-run-all2": "9.1.0",
+        "sort-package-json": "4.1.0",
+        "tsdown": "0.23.7",
+        "typescript": "7.0.2",
+        "vitest": "5.1.1"
     },
     "engines": {
-        "node": "24.x"
+        "node": "24.x || 26.x"
     }
 }

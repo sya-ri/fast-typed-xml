@@ -192,7 +192,7 @@ describe("tx.string", () => {
         expect(actual.name).toBe("test");
     });
 
-    it("should parse optional string when missing", () => {
+    it("omits a missing optional string attribute", () => {
         const schema = tx.object({
             value: tx.string("VALUE", "attribute", true),
         });

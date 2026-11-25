@@ -6,17 +6,18 @@ type MakeOptional<T, Optional extends boolean> = Optional extends true
     ? T | undefined
     : T;
 
-export type Infer<S> = S extends AttributeSchema<infer T, infer Optional>
-    ? MakeOptional<T, Optional>
-    : S extends ValueSchema<infer T>
-      ? T
-      : S extends ElementSchema<infer T, infer Optional>
-        ? MakeOptional<Infer<T>, Optional>
-        : S extends ObjectSchema<infer T, infer _>
-          ? { [key in keyof T]: Infer<T[key]> }
-          : S extends ArraySchema<infer T, boolean, infer Optional>
-            ? MakeOptional<Infer<T>[], Optional>
-            : S;
+export type Infer<S> =
+    S extends AttributeSchema<infer T, infer Optional>
+        ? MakeOptional<T, Optional>
+        : S extends ValueSchema<infer T>
+          ? T
+          : S extends ElementSchema<infer T, infer Optional>
+            ? MakeOptional<Infer<T>, Optional>
+            : S extends ObjectSchema<infer T, infer _>
+              ? { [key in keyof T]: Infer<T[key]> }
+              : S extends ArraySchema<infer T, boolean, infer Optional>
+                ? MakeOptional<Infer<T>[], Optional>
+                : S;
 
 interface Schema<T, Optional extends boolean> {
     decode: (node: NodeLike) => Optional extends true ? T | undefined : T;

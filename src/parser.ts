@@ -52,6 +52,7 @@ class XMLParser {
             (code >= 48 && code <= 57) || // 0-9
             (code >= 65 && code <= 90) || // A-Z
             (code >= 97 && code <= 122) || // a-z
+            code === 58 || // : in qualified names
             code === 46 || // .
             code === 95 || // _
             code === 45 // -
@@ -137,6 +138,7 @@ class XMLParser {
     }
 
     parseDocument(): NodeLike {
+        if (this.src.charCodeAt(0) === 0xfeff) this.i++;
         this.skipMisc();
         const root = this.parseElement(0);
         this.skipMisc();
